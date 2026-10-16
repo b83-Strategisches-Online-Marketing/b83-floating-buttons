@@ -1,0 +1,437 @@
+/**
+ * b83 Floating Buttons – Frontend
+ *
+ * Gestaltung je Leiste über CSS-Variablen (--b83fb-…), die das Plugin
+ * aus den Einstellungen setzt. Eigene Anpassungen im Theme über die
+ * festen Klassen b83-fb, b83-fb__item, b83-fb__btn, b83-fb__icon,
+ * b83-fb__label, b83-fb__tip.
+ *
+ * Breakpoints wie Elementor: Mobil bis 767 px, Tablet bis 1024 px.
+ */
+
+.b83-fb {
+	--b83fb-size: 52px;
+	--b83fb-size-m: 44px;
+	--b83fb-s: var(--b83fb-size);
+	--b83fb-icon: .5;
+	--b83fb-radius: 10px;
+	--b83fb-gap: 6px;
+	--b83fb-edge: 0px;
+	--b83fb-offset: 0px;
+	--b83fb-peek: 0%;
+	--b83fb-font: 15px;
+	--b83fb-weight: 600;
+	--b83fb-delay: 150ms;
+	--b83fb-dur: 300ms;
+	--b83fb-z: 9990;
+	--b83fb-bg: #1d2a3a;
+	--b83fb-color: #fff;
+	--b83fb-text: #fff;
+	--b83fb-bg-h: #e30613;
+	--b83fb-color-h: #fff;
+	--b83fb-text-h: #fff;
+	--b83fb-tip-bg: #111;
+	--b83fb-tip-color: #fff;
+	--b83fb-label-max: 340px;
+	--b83fb-shadow: none;
+	--b83fb-ease: cubic-bezier(.22, .8, .3, 1);
+
+	position: fixed;
+	z-index: var(--b83fb-z);
+	margin: 0;
+	padding: 0;
+	pointer-events: none;
+	font-family: inherit;
+	line-height: 1.2;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.b83-fb--shadow-soft { --b83fb-shadow: 0 4px 14px rgba(0, 0, 0, .18); }
+.b83-fb--shadow-strong { --b83fb-shadow: 0 8px 28px rgba(0, 0, 0, .34); }
+
+.b83-fb *,
+.b83-fb *::before,
+.b83-fb *::after { box-sizing: border-box; }
+
+.b83-fb__list {
+	display: flex;
+	gap: var(--b83fb-gap);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* ---------------------------------------------------------------------
+ * Position der Leiste
+ * ------------------------------------------------------------------- */
+
+.b83-fb--left { left: var(--b83fb-edge); }
+.b83-fb--right { right: var(--b83fb-edge); }
+.b83-fb--left .b83-fb__list,
+.b83-fb--right .b83-fb__list { flex-direction: column; }
+
+.b83-fb--left.b83-fb--align-start,
+.b83-fb--right.b83-fb--align-start { top: var(--b83fb-offset); }
+.b83-fb--left.b83-fb--align-center,
+.b83-fb--right.b83-fb--align-center { top: 50%; transform: translateY(-50%); }
+.b83-fb--left.b83-fb--align-end,
+.b83-fb--right.b83-fb--align-end { bottom: var(--b83fb-offset); }
+
+.b83-fb--top { top: var(--b83fb-edge); }
+.b83-fb--bottom { bottom: var(--b83fb-edge); }
+.b83-fb--top .b83-fb__list,
+.b83-fb--bottom .b83-fb__list { flex-direction: row; }
+
+.b83-fb--top.b83-fb--align-start,
+.b83-fb--bottom.b83-fb--align-start { left: var(--b83fb-offset); }
+.b83-fb--top.b83-fb--align-center,
+.b83-fb--bottom.b83-fb--align-center { left: 50%; transform: translateX(-50%); }
+.b83-fb--top.b83-fb--align-end,
+.b83-fb--bottom.b83-fb--align-end { right: var(--b83fb-offset); }
+
+/* Angemeldete Nutzer: WordPress-Werkzeugleiste nicht verdecken */
+.admin-bar .b83-fb--top { top: calc(var(--b83fb-edge) + 32px); }
+@media (max-width: 782px) {
+	.admin-bar .b83-fb--top { top: calc(var(--b83fb-edge) + 46px); }
+}
+
+/* ---------------------------------------------------------------------
+ * Button
+ *
+ * Jeder Button hat einen festen Platz (Größe des Icons). Beim Ausklappen
+ * wächst er über diesen Platz hinaus, ohne die anderen zu verschieben.
+ * ------------------------------------------------------------------- */
+
+.b83-fb__item {
+	position: relative;
+	width: var(--b83fb-s);
+	height: var(--b83fb-s);
+	margin: 0;
+	padding: 0;
+	pointer-events: auto;
+}
+
+.b83-fb__btn {
+	--b83fb-tx: 0;
+	--b83fb-ty: 0;
+
+	position: absolute;
+	top: 0;
+	display: flex;
+	align-items: center;
+	height: var(--b83fb-s);
+	min-width: var(--b83fb-s);
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: var(--b83fb-radius);
+	background: var(--b83fb-bg);
+	color: var(--b83fb-color);
+	box-shadow: var(--b83fb-shadow);
+	font-size: var(--b83fb-font);
+	font-weight: var(--b83fb-weight);
+	text-decoration: none !important;
+	white-space: nowrap;
+	cursor: pointer;
+	outline-offset: 3px;
+	transform: translate(var(--b83fb-tx), var(--b83fb-ty));
+	transition:
+		background-color var(--b83fb-dur) ease,
+		color var(--b83fb-dur) ease,
+		transform var(--b83fb-dur) var(--b83fb-ease);
+}
+
+span.b83-fb__btn { cursor: default; }
+
+/* Fokusrahmen nur um den Button (outline würde die Info-Blase mit einschließen) */
+.b83-fb__btn:focus { outline: none; }
+.b83-fb__btn:focus-visible { box-shadow: var(--b83fb-shadow), 0 0 0 2px #fff, 0 0 0 4px #1a1a1a; }
+
+/* Links am Rand: Text erscheint am Rand, das Icon fährt nach innen heraus */
+.b83-fb--left .b83-fb__btn { left: 0; flex-direction: row-reverse; }
+.b83-fb--right .b83-fb__btn { right: 0; flex-direction: row; }
+.b83-fb--top .b83-fb__btn,
+.b83-fb--bottom .b83-fb__btn { left: 50%; --b83fb-tx: -50%; flex-direction: row; }
+/* Oben/unten: Wuchsrichtung nach Ausrichtung, damit nichts aus dem Bild ragt */
+.b83-fb--top.b83-fb--align-start .b83-fb__btn,
+.b83-fb--bottom.b83-fb--align-start .b83-fb__btn { left: 0; --b83fb-tx: 0; }
+.b83-fb--top.b83-fb--align-end .b83-fb__btn,
+.b83-fb--bottom.b83-fb--align-end .b83-fb__btn { left: auto; right: 0; --b83fb-tx: 0; flex-direction: row-reverse; }
+.b83-fb--top.b83-fb--align-end .b83-fb__label-text,
+.b83-fb--bottom.b83-fb--align-end .b83-fb__label-text { padding-right: 0; padding-left: 1em; }
+
+/* Aktiver Button liegt über seinen Nachbarn */
+.b83-fb__item:hover,
+.b83-fb__item:focus-within,
+.b83-fb__item.is-open { z-index: 5; }
+
+/* Direkt am Rand anliegend: Ecken auf der Randseite gerade */
+.b83-fb--flush.b83-fb--left .b83-fb__btn { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.b83-fb--flush.b83-fb--right .b83-fb__btn { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.b83-fb--flush.b83-fb--top .b83-fb__btn { border-top-left-radius: 0; border-top-right-radius: 0; }
+.b83-fb--flush.b83-fb--bottom .b83-fb__btn { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+
+/* Eingeklappt teilweise im Rand versteckt */
+.b83-fb--left .b83-fb__btn { --b83fb-tx: calc(var(--b83fb-peek) * -1); }
+.b83-fb--right .b83-fb__btn { --b83fb-tx: var(--b83fb-peek); }
+.b83-fb--top .b83-fb__btn { --b83fb-ty: calc(var(--b83fb-peek) * -1); }
+.b83-fb--bottom .b83-fb__btn { --b83fb-ty: var(--b83fb-peek); }
+
+.b83-fb__icon {
+	display: flex;
+	flex: 0 0 var(--b83fb-s);
+	align-items: center;
+	justify-content: center;
+	width: var(--b83fb-s);
+	height: var(--b83fb-s);
+	transition: color var(--b83fb-dur) ease;
+}
+
+.b83-fb__icon svg,
+.b83-fb__icon .b83-fb__img {
+	display: block;
+	width: calc(var(--b83fb-s) * var(--b83fb-icon));
+	height: calc(var(--b83fb-s) * var(--b83fb-icon));
+	max-width: none;
+	margin: 0;
+	object-fit: contain;
+}
+
+.b83-fb__label {
+	display: block;
+	overflow: hidden;
+	max-width: 0;
+	opacity: 0;
+	color: var(--b83fb-text);
+	transition:
+		max-width var(--b83fb-dur) var(--b83fb-ease),
+		opacity calc(var(--b83fb-dur) * .7) ease,
+		color var(--b83fb-dur) ease;
+}
+
+.b83-fb__label-text { display: block; }
+.b83-fb--left .b83-fb__label-text { padding-left: 1em; }
+.b83-fb--right .b83-fb__label-text,
+.b83-fb--top .b83-fb__label-text,
+.b83-fb--bottom .b83-fb__label-text { padding-right: 1em; }
+
+/* ---------------------------------------------------------------------
+ * Ausklappen: bei Mouseover verzögert, bei Tastatur und Antippen sofort
+ * ------------------------------------------------------------------- */
+
+@media (hover: hover) {
+	.b83-fb__item:hover .b83-fb__btn {
+		z-index: 2;
+		background: var(--b83fb-bg-h);
+		color: var(--b83fb-color-h);
+	}
+	.b83-fb__item:hover .b83-fb__label {
+		max-width: var(--b83fb-label-max);
+		opacity: 1;
+		color: var(--b83fb-text-h);
+		transition-delay: var(--b83fb-delay), var(--b83fb-delay), 0s;
+	}
+	.b83-fb--left .b83-fb__item:hover .b83-fb__btn,
+	.b83-fb--right .b83-fb__item:hover .b83-fb__btn { --b83fb-tx: 0; transition-delay: 0s, 0s, var(--b83fb-delay); }
+	.b83-fb--top .b83-fb__item:hover .b83-fb__btn,
+	.b83-fb--bottom .b83-fb__item:hover .b83-fb__btn { --b83fb-ty: 0; transition-delay: 0s, 0s, var(--b83fb-delay); }
+}
+
+.b83-fb__item.is-open .b83-fb__btn,
+.b83-fb__btn:focus-visible {
+	z-index: 2;
+	background: var(--b83fb-bg-h);
+	color: var(--b83fb-color-h);
+}
+.b83-fb__item.is-open .b83-fb__label,
+.b83-fb__btn:focus-visible .b83-fb__label {
+	max-width: var(--b83fb-label-max);
+	opacity: 1;
+	color: var(--b83fb-text-h);
+}
+.b83-fb--left .b83-fb__item.is-open .b83-fb__btn,
+.b83-fb--right .b83-fb__item.is-open .b83-fb__btn,
+.b83-fb--left .b83-fb__btn:focus-visible,
+.b83-fb--right .b83-fb__btn:focus-visible { --b83fb-tx: 0; }
+.b83-fb--top .b83-fb__item.is-open .b83-fb__btn,
+.b83-fb--bottom .b83-fb__item.is-open .b83-fb__btn,
+.b83-fb--top .b83-fb__btn:focus-visible,
+.b83-fb--bottom .b83-fb__btn:focus-visible { --b83fb-ty: 0; }
+
+/* ---------------------------------------------------------------------
+ * Info-Text (Tooltip) – erscheint nach dem Ausklappen
+ * ------------------------------------------------------------------- */
+
+.b83-fb__tip {
+	position: absolute;
+	z-index: 3;
+	width: max-content;
+	max-width: min(260px, 70vw);
+	padding: .55em .8em;
+	border-radius: 6px;
+	background: var(--b83fb-tip-bg);
+	color: var(--b83fb-tip-color);
+	box-shadow: 0 4px 14px rgba(0, 0, 0, .2);
+	font-size: max(12px, calc(var(--b83fb-font) * .85));
+	font-weight: 400;
+	line-height: 1.4;
+	white-space: normal;
+	text-align: left;
+	pointer-events: none;
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 180ms ease, visibility 0s linear 180ms, transform 180ms ease;
+}
+
+.b83-fb__tip::before {
+	content: "";
+	position: absolute;
+	border: 6px solid transparent;
+}
+
+.b83-fb--left .b83-fb__tip { left: calc(100% + 12px); top: 50%; transform: translate(-4px, -50%); }
+.b83-fb--left .b83-fb__tip::before { right: 100%; top: 50%; margin-top: -6px; border-right-color: var(--b83fb-tip-bg); }
+.b83-fb--right .b83-fb__tip { right: calc(100% + 12px); top: 50%; transform: translate(4px, -50%); }
+.b83-fb--right .b83-fb__tip::before { left: 100%; top: 50%; margin-top: -6px; border-left-color: var(--b83fb-tip-bg); }
+.b83-fb--top .b83-fb__tip { top: calc(100% + 12px); left: 50%; transform: translate(-50%, -4px); }
+.b83-fb--top .b83-fb__tip::before { bottom: 100%; left: 50%; margin-left: -6px; border-bottom-color: var(--b83fb-tip-bg); }
+.b83-fb--bottom .b83-fb__tip { bottom: calc(100% + 12px); left: 50%; transform: translate(-50%, 4px); }
+.b83-fb--bottom .b83-fb__tip::before { top: 100%; left: 50%; margin-left: -6px; border-top-color: var(--b83fb-tip-bg); }
+
+@media (hover: hover) {
+	.b83-fb__item:hover .b83-fb__tip {
+		visibility: visible;
+		opacity: 1;
+		transition-delay: calc(var(--b83fb-delay) + var(--b83fb-dur) * .6);
+	}
+}
+.b83-fb__item.is-open .b83-fb__tip,
+.b83-fb__btn:focus-visible .b83-fb__tip {
+	visibility: visible;
+	opacity: 1;
+	transition-delay: 0s;
+}
+.b83-fb--left .b83-fb__item:hover .b83-fb__tip,
+.b83-fb--right .b83-fb__item:hover .b83-fb__tip,
+.b83-fb--left .b83-fb__item.is-open .b83-fb__tip,
+.b83-fb--right .b83-fb__item.is-open .b83-fb__tip,
+.b83-fb--left .b83-fb__btn:focus-visible .b83-fb__tip,
+.b83-fb--right .b83-fb__btn:focus-visible .b83-fb__tip { transform: translate(0, -50%); }
+.b83-fb--top .b83-fb__item:hover .b83-fb__tip,
+.b83-fb--bottom .b83-fb__item:hover .b83-fb__tip,
+.b83-fb--top .b83-fb__item.is-open .b83-fb__tip,
+.b83-fb--bottom .b83-fb__item.is-open .b83-fb__tip,
+.b83-fb--top .b83-fb__btn:focus-visible .b83-fb__tip,
+.b83-fb--bottom .b83-fb__btn:focus-visible .b83-fb__tip { transform: translate(-50%, 0); }
+
+.b83-fb--no-tips .b83-fb__tip { display: none; }
+
+/* Nur für Screenreader */
+.b83-fb__sr {
+	position: absolute !important;
+	overflow: hidden;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------
+ * Einblenden beim Laden
+ * ------------------------------------------------------------------- */
+
+@keyframes b83fb-fade { from { opacity: 0; } }
+@keyframes b83fb-from-left { from { opacity: 0; transform: translateX(-110%); } }
+@keyframes b83fb-from-right { from { opacity: 0; transform: translateX(110%); } }
+@keyframes b83fb-from-top { from { opacity: 0; transform: translateY(-110%); } }
+@keyframes b83fb-from-bottom { from { opacity: 0; transform: translateY(110%); } }
+
+.b83-fb--enter-fade .b83-fb__item { animation: b83fb-fade 500ms ease both; }
+.b83-fb--enter-slide.b83-fb--left .b83-fb__item { animation: b83fb-from-left 550ms var(--b83fb-ease) both; }
+.b83-fb--enter-slide.b83-fb--right .b83-fb__item { animation: b83fb-from-right 550ms var(--b83fb-ease) both; }
+.b83-fb--enter-slide.b83-fb--top .b83-fb__item { animation: b83fb-from-top 550ms var(--b83fb-ease) both; }
+.b83-fb--enter-slide.b83-fb--bottom .b83-fb__item { animation: b83fb-from-bottom 550ms var(--b83fb-ease) both; }
+
+.b83-fb__item:nth-child(1) { animation-delay: 300ms; }
+.b83-fb__item:nth-child(2) { animation-delay: 380ms; }
+.b83-fb__item:nth-child(3) { animation-delay: 460ms; }
+.b83-fb__item:nth-child(4) { animation-delay: 540ms; }
+.b83-fb__item:nth-child(5) { animation-delay: 620ms; }
+.b83-fb__item:nth-child(6) { animation-delay: 700ms; }
+.b83-fb__item:nth-child(n+7) { animation-delay: 780ms; }
+
+/* ---------------------------------------------------------------------
+ * Geräte
+ * ------------------------------------------------------------------- */
+
+@media (min-width: 1025px) {
+	.b83-fb--hide-desktop { display: none !important; }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+	.b83-fb--hide-tablet { display: none !important; }
+}
+
+@media (max-width: 767px) {
+	.b83-fb--hide-mobile { display: none !important; }
+
+	.b83-fb { --b83fb-s: var(--b83fb-size-m); --b83fb-label-max: 70vw; }
+
+	/* Kompakt: nur Icons, Antippen öffnet direkt */
+	.b83-fb--m-compact .b83-fb__label,
+	.b83-fb--m-compact .b83-fb__tip { display: none; }
+	.b83-fb--m-compact .b83-fb__btn { --b83fb-tx: 0; --b83fb-ty: 0; }
+	.b83-fb--m-compact.b83-fb--top.b83-fb--align-center .b83-fb__btn,
+	.b83-fb--m-compact.b83-fb--bottom.b83-fb--align-center .b83-fb__btn { --b83fb-tx: -50%; }
+
+	/* Leiste am unteren Rand über die ganze Breite */
+	.b83-fb--m-bar {
+		top: auto !important;
+		right: 0 !important;
+		bottom: 0 !important;
+		left: 0 !important;
+		transform: none !important;
+		background: var(--b83fb-bg);
+		box-shadow: 0 -2px 12px rgba(0, 0, 0, .15);
+		padding-bottom: env(safe-area-inset-bottom, 0);
+	}
+	.b83-fb--m-bar .b83-fb__list { flex-direction: row; gap: 0; }
+	.b83-fb--m-bar .b83-fb__item { flex: 1 1 0; width: auto; height: auto; min-width: 0; animation: b83fb-fade 400ms ease both; }
+	.b83-fb--m-bar .b83-fb__item + .b83-fb__item { border-left: 1px solid rgba(255, 255, 255, .15); }
+	.b83-fb--m-bar .b83-fb__btn {
+		position: static;
+		flex-direction: column;
+		justify-content: center;
+		gap: 2px;
+		width: 100%;
+		height: auto;
+		min-height: var(--b83fb-s);
+		padding: 6px 2px;
+		border-radius: 0 !important;
+		box-shadow: none;
+		transform: none;
+	}
+	.b83-fb--m-bar .b83-fb__icon { flex: 0 0 auto; width: auto; height: calc(var(--b83fb-s) * .6); }
+	.b83-fb--m-bar .b83-fb__icon svg,
+	.b83-fb--m-bar .b83-fb__icon .b83-fb__img { width: calc(var(--b83fb-s) * .5); height: calc(var(--b83fb-s) * .5); }
+	.b83-fb--m-bar .b83-fb__label,
+	.b83-fb--m-bar .b83-fb__item.is-open .b83-fb__label { max-width: 100%; opacity: 1; font-size: 11px; font-weight: 600; }
+	.b83-fb--m-bar .b83-fb__label-text { padding: 0 !important; overflow: hidden; text-overflow: ellipsis; }
+	.b83-fb--m-bar .b83-fb__tip { display: none; }
+
+	body.b83-fb-has-bar { padding-bottom: calc(var(--b83fb-bar-space, 56px) + env(safe-area-inset-bottom, 0px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.b83-fb__item,
+	.b83-fb__btn,
+	.b83-fb__label,
+	.b83-fb__tip { animation: none !important; transition-duration: 1ms !important; transition-delay: 0s !important; }
+}
+
+@media print {
+	.b83-fb { display: none !important; }
+}
