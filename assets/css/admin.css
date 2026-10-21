@@ -107,6 +107,8 @@
 .b83-fb-row:last-child { margin-bottom: 0; }
 .b83-fb-field { display: flex; flex: 1 1 200px; flex-direction: column; gap: 5px; min-width: 0; }
 .b83-fb-field .description { font-size: 12px; line-height: 1.4; }
+/* Feld so breit wie sein Inhalt – das nächste Feld rückt sonst darunter */
+.b83-fb-field--auto { flex: 0 0 auto; }
 .b83-fb-label { font-weight: 600; font-size: 13px; }
 .b83-fb-label--small { margin-top: 10px; font-weight: 400; color: var(--b83a-muted); }
 .b83-fb-field input[type="text"],
@@ -231,7 +233,12 @@
 .b83-fb-item[data-link="sms"] .b83-fb-when-sms,
 .b83-fb-item[data-link="email"] .b83-fb-when-email,
 .b83-fb-item[data-link="whatsapp"] .b83-fb-when-whatsapp { display: flex; }
+.b83-fb-item[data-link="chat"] .b83-fb-when-chat { display: flex; }
+.b83-fb-item .b83-fb-when-fa { display: none; }
+.b83-fb-item[data-icon-type="fa"] .b83-fb-when-fa { display: flex; }
 .b83-fb-item[data-icon-type="icon"] .b83-fb-when-image,
+.b83-fb-item[data-icon-type="fa"] .b83-fb-when-image,
+.b83-fb-item[data-icon-type="fa"] .b83-fb-when-icon,
 .b83-fb-item[data-icon-type="image"] .b83-fb-when-icon { display: none; }
 
 .b83-fb-pick { display: inline-flex !important; align-items: center; gap: 8px; width: max-content; height: auto !important; padding: 4px 12px 4px 4px !important; }
@@ -421,3 +428,15 @@
 .b83-fb-picker__icon:hover,
 .b83-fb-picker__icon:focus-visible { border-color: #c3c4c7; background: var(--b83a-soft); }
 .b83-fb-picker__icon.is-current { border-color: var(--b83a-accent); background: #f0f6fc; }
+
+/* Font-Awesome-Auswahl */
+.b83-fb-picker__filter { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 10px; border-bottom: 1px solid var(--b83a-border); }
+.b83-fb-picker__filter label { cursor: pointer; }
+.b83-fb-picker__filter input { position: absolute; opacity: 0; pointer-events: none; }
+.b83-fb-picker__filter span { display: inline-block; padding: 3px 10px; border: 1px solid var(--b83a-border); border-radius: 999px; font-size: 12px; }
+.b83-fb-picker__filter input:checked + span { border-color: var(--b83a-accent); background: #f0f6fc; color: var(--b83a-accent); }
+.b83-fb-picker__filter input:focus-visible + span { outline: 2px solid var(--b83a-accent); outline-offset: 1px; }
+.b83-fb-picker--fa .b83-fb-picker__grid { margin-top: 10px; }
+.b83-fb-picker__note { margin: 10px 0 0; color: var(--b83a-muted); font-size: 12px; }
+.b83-fb-picker__note:empty { display: none; }
+.b83-fb-picker__foot { padding: 6px 12px; border-top: 1px solid var(--b83a-border); color: var(--b83a-muted); font-size: 11px; }

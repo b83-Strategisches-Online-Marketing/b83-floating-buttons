@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       b83 Floating Buttons
  * Plugin URI:        https://b83.at
- * Description:       Schwebende Buttons am linken, rechten, oberen oder unteren Rand jeder Seite – mit Icons oder eigenen Grafiken, Ausklapp-Text bei Mouseover, Info-Text, Links, E-Mail, Telefon und WhatsApp. Frei gestaltbar und responsiv.
- * Version:           1.0.0
+ * Description:       Schwebende Buttons am linken, rechten, oberen oder unteren Rand jeder Seite – mit Font-Awesome-Icons, eigenen Icons oder Bildern, Ausklapp-Text mit Zusatztext bei Mouseover, Info-Text, Links, E-Mail, Telefon, WhatsApp und Chat. Frei gestaltbar und responsiv.
+ * Version:           1.1.0
  * Requires at least: 6.2
  * Requires PHP:      8.1
  * Author:            b83 – Wolfgang Grabs-Schrempf
@@ -21,7 +21,7 @@ declare(strict_types=1);
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'B83_FB_VERSION', '1.0.0' );
+define( 'B83_FB_VERSION', '1.1.0' );
 define( 'B83_FB_FILE', __FILE__ );
 define( 'B83_FB_DIR', plugin_dir_path( __FILE__ ) );
 define( 'B83_FB_URL', plugin_dir_url( __FILE__ ) );

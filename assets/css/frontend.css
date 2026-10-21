@@ -4,7 +4,7 @@
  * Gestaltung je Leiste über CSS-Variablen (--b83fb-…), die das Plugin
  * aus den Einstellungen setzt. Eigene Anpassungen im Theme über die
  * festen Klassen b83-fb, b83-fb__item, b83-fb__btn, b83-fb__icon,
- * b83-fb__label, b83-fb__tip.
+ * b83-fb__label, b83-fb__title, b83-fb__sub, b83-fb__tip.
  *
  * Breakpoints wie Elementor: Mobil bis 767 px, Tablet bis 1024 px.
  */
@@ -20,6 +20,7 @@
 	--b83fb-offset: 0px;
 	--b83fb-peek: 0%;
 	--b83fb-font: 15px;
+	--b83fb-sub: 12px;
 	--b83fb-weight: 600;
 	--b83fb-delay: 150ms;
 	--b83fb-dur: 300ms;
@@ -119,7 +120,7 @@
 	top: 0;
 	display: flex;
 	align-items: center;
-	height: var(--b83fb-s);
+	min-height: var(--b83fb-s);
 	min-width: var(--b83fb-s);
 	margin: 0;
 	padding: 0;
@@ -134,7 +135,8 @@
 	white-space: nowrap;
 	cursor: pointer;
 	outline-offset: 3px;
-	transform: translate(var(--b83fb-tx), var(--b83fb-ty));
+	/* --b83fb-cy zentriert höhere Buttons (Überschrift + Zusatztext) auf ihrem Platz */
+	transform: translate(var(--b83fb-tx), var(--b83fb-ty)) translateY(var(--b83fb-cy, 0));
 	transition:
 		background-color var(--b83fb-dur) ease,
 		color var(--b83fb-dur) ease,
@@ -150,6 +152,10 @@ span.b83-fb__btn { cursor: default; }
 /* Links am Rand: Text erscheint am Rand, das Icon fährt nach innen heraus */
 .b83-fb--left .b83-fb__btn { left: 0; flex-direction: row-reverse; }
 .b83-fb--right .b83-fb__btn { right: 0; flex-direction: row; }
+.b83-fb--left .b83-fb__btn,
+.b83-fb--right .b83-fb__btn { top: 50%; --b83fb-cy: -50%; }
+/* Unten am Rand: höhere Buttons wachsen nach oben statt aus dem Bild */
+.b83-fb--bottom .b83-fb__btn { top: auto; bottom: 0; }
 .b83-fb--top .b83-fb__btn,
 .b83-fb--bottom .b83-fb__btn { left: 50%; --b83fb-tx: -50%; flex-direction: row; }
 /* Oben/unten: Wuchsrichtung nach Ausrichtung, damit nichts aus dem Bild ragt */
@@ -210,6 +216,20 @@ span.b83-fb__btn { cursor: default; }
 }
 
 .b83-fb__label-text { display: block; }
+.b83-fb__title,
+.b83-fb__sub { display: block; overflow: hidden; text-overflow: ellipsis; }
+.b83-fb__title { line-height: 1.2; }
+.b83-fb__item--has-sub .b83-fb__label-text { padding-top: .3em; padding-bottom: .3em; }
+.b83-fb__sub {
+	margin-top: .15em;
+	font-size: var(--b83fb-sub, 12px);
+	font-weight: 400;
+	line-height: 1.25;
+	opacity: .85;
+}
+/* Überschrift und Zusatztext immer linksbündig */
+.b83-fb--left .b83-fb__label-text,
+.b83-fb--right .b83-fb__label-text { text-align: left; }
 .b83-fb--left .b83-fb__label-text { padding-left: 1em; }
 .b83-fb--right .b83-fb__label-text,
 .b83-fb--top .b83-fb__label-text,
@@ -420,6 +440,7 @@ span.b83-fb__btn { cursor: default; }
 	.b83-fb--m-bar .b83-fb__label,
 	.b83-fb--m-bar .b83-fb__item.is-open .b83-fb__label { max-width: 100%; opacity: 1; font-size: 11px; font-weight: 600; }
 	.b83-fb--m-bar .b83-fb__label-text { padding: 0 !important; overflow: hidden; text-overflow: ellipsis; }
+	.b83-fb--m-bar .b83-fb__sub { display: none; }
 	.b83-fb--m-bar .b83-fb__tip { display: none; }
 
 	body.b83-fb-has-bar { padding-bottom: calc(var(--b83fb-bar-space, 56px) + env(safe-area-inset-bottom, 0px)); }

@@ -18,6 +18,7 @@ use B83\FloatingButtons\Frontend\Renderer;
 use B83\FloatingButtons\Icons;
 use B83\FloatingButtons\Migration;
 use B83\FloatingButtons\Repository;
+use B83\FloatingButtons\FontAwesome;
 use B83\FloatingButtons\Sanitizer;
 
 defined( 'ABSPATH' ) || exit;
@@ -123,6 +124,7 @@ final class AdminPage {
 			array(
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( 'b83_fb_preview' ),
+				'faUrl'   => B83_FB_URL . FontAwesome::data_path() . '?ver=' . rawurlencode( B83_FB_VERSION ),
 				'i18n'    => array(
 					'mediaTitle'  => __( 'Grafik für den Button wählen', 'b83-floating-buttons' ),
 					'mediaButton' => __( 'Grafik verwenden', 'b83-floating-buttons' ),
@@ -134,6 +136,12 @@ final class AdminPage {
 						Sanitizer::MAX_ITEMS
 					),
 					'previewErr'  => __( 'Vorschau konnte nicht geladen werden.', 'b83-floating-buttons' ),
+					'faLoading'   => __( 'Icons werden geladen …', 'b83-floating-buttons' ),
+					'faError'     => __( 'Die Icon-Liste konnte nicht geladen werden.', 'b83-floating-buttons' ),
+					'faNone'      => __( 'Kein Icon gefunden – auf Englisch suchen, z. B. „phone“, „bed“, „ski“.', 'b83-floating-buttons' ),
+					/* translators: 1: angezeigte Icons, 2: Treffer gesamt */
+					'faMore'      => __( '%1$d von %2$d Treffern – Suche verfeinern, um mehr zu sehen.', 'b83-floating-buttons' ),
+					'faChoose'    => __( 'Icon wählen', 'b83-floating-buttons' ),
 				),
 				'maxItems' => Sanitizer::MAX_ITEMS,
 				'linkTypes' => array(
@@ -141,6 +149,7 @@ final class AdminPage {
 					'phone'    => __( 'Telefon', 'b83-floating-buttons' ),
 					'email'    => __( 'E-Mail', 'b83-floating-buttons' ),
 					'whatsapp' => __( 'WhatsApp', 'b83-floating-buttons' ),
+					'chat'     => __( 'Chat', 'b83-floating-buttons' ),
 					'sms'      => __( 'SMS', 'b83-floating-buttons' ),
 					'top'      => __( 'Nach oben', 'b83-floating-buttons' ),
 					'none'     => __( 'Nur Info', 'b83-floating-buttons' ),
@@ -527,6 +536,9 @@ final class AdminPage {
 				return '<img src="' . esc_url( $url ) . '" alt="">';
 			}
 		}
+		if ( 'fa' === $item['icon_type'] && '' !== (string) $item['fa_path'] ) {
+			return FontAwesome::svg( (int) $item['fa_width'], (string) $item['fa_path'] );
+		}
 		return $this->icons->svg( (string) $item['icon'] );
 	}
 
@@ -670,6 +682,7 @@ final class AdminPage {
 		echo '</form>';
 
 		$this->render_icon_picker();
+		$this->render_fa_picker();
 		$this->render_item_template();
 	}
 
@@ -718,9 +731,14 @@ final class AdminPage {
 
 		// Grafik.
 		echo '<div class="b83-fb-row">';
-		echo '<div class="b83-fb-field"><span class="b83-fb-label">' . esc_html__( 'Grafik', 'b83-floating-buttons' ) . '</span>';
+		echo '<div class="b83-fb-field b83-fb-field--auto"><span class="b83-fb-label">' . esc_html__( 'Grafik', 'b83-floating-buttons' ) . '</span>';
 		echo '<span class="b83-fb-seg">';
-		foreach ( array( 'icon' => __( 'Icon', 'b83-floating-buttons' ), 'image' => __( 'Eigene Grafik', 'b83-floating-buttons' ) ) as $value => $label ) {
+		$icon_types = array(
+			'fa'    => __( 'Font Awesome', 'b83-floating-buttons' ),
+			'icon'  => __( 'b83-Icons', 'b83-floating-buttons' ),
+			'image' => __( 'Eigenes Bild', 'b83-floating-buttons' ),
+		);
+		foreach ( $icon_types as $value => $label ) {
 			echo '<label><input type="radio" data-role="icon-type" name="' . esc_attr( $n . '[icon_type]' ) . '" value="' . esc_attr( $value ) . '"' . checked( $item['icon_type'], $value, false ) . '><span>' . esc_html( $label ) . '</span></label>';
 		}
 		echo '</span></div>';
@@ -728,6 +746,12 @@ final class AdminPage {
 		echo '<div class="b83-fb-field b83-fb-when-icon"><span class="b83-fb-label">' . esc_html__( 'Icon', 'b83-floating-buttons' ) . '</span>';
 		echo '<input type="hidden" data-role="icon" name="' . esc_attr( $n . '[icon]' ) . '" value="' . esc_attr( (string) $item['icon'] ) . '">';
 		echo '<button type="button" class="button b83-fb-pick" data-role="pick-icon"><span class="b83-fb-pick__svg" data-role="icon-preview">' . $this->icons->svg( (string) $item['icon'] ) . '</span><span data-role="icon-name">' . esc_html( (string) ( $this->icons->all()[ (string) $item['icon'] ]['label'] ?? '' ) ) . '</span></button></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Icons::svg() gefiltert.
+
+		$fa_svg = '' !== (string) $item['fa_path'] ? FontAwesome::svg( (int) $item['fa_width'], (string) $item['fa_path'] ) : '';
+		echo '<div class="b83-fb-field b83-fb-when-fa"><span class="b83-fb-label">' . esc_html__( 'Font-Awesome-Icon', 'b83-floating-buttons' ) . '</span>';
+		echo '<input type="hidden" data-role="fa" name="' . esc_attr( $n . '[fa]' ) . '" value="' . esc_attr( (string) $item['fa'] ) . '">';
+		echo '<button type="button" class="button b83-fb-pick" data-role="pick-fa"><span class="b83-fb-pick__svg" data-role="fa-preview">' . $fa_svg . '</span><span data-role="fa-name">' . esc_html( '' !== (string) $item['fa_label'] ? (string) $item['fa_label'] : __( 'Icon wählen', 'b83-floating-buttons' ) ) . '</span></button>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- FontAwesome::svg() prüft den Pfad und escaped.
+		echo '<span class="description">' . esc_html__( 'Über 2.100 Icons (Solid, Regular, Marken). Wird als kleines SVG eingebettet – es wird keine Font-Awesome-Schrift geladen.', 'b83-floating-buttons' ) . '</span></div>';
 
 		$img_url = $item['image_id'] ? (string) wp_get_attachment_image_url( (int) $item['image_id'], 'thumbnail' ) : '';
 		echo '<div class="b83-fb-field b83-fb-when-image"><span class="b83-fb-label">' . esc_html__( 'Eigene Grafik', 'b83-floating-buttons' ) . '</span>';
@@ -740,7 +764,10 @@ final class AdminPage {
 
 		// Texte.
 		echo '<div class="b83-fb-row">';
-		$this->text_field( $uid . '-label', $n . '[label]', __( 'Text beim Ausklappen', 'b83-floating-buttons' ), (string) $item['label'], 60, __( 'z. B. Jetzt anrufen', 'b83-floating-buttons' ), __( 'Leer lassen für einen reinen Icon-Button.', 'b83-floating-buttons' ), 'label' );
+		$this->text_field( $uid . '-label', $n . '[label]', __( 'Überschrift beim Ausklappen', 'b83-floating-buttons' ), (string) $item['label'], 60, __( 'z. B. Jetzt anrufen', 'b83-floating-buttons' ), __( 'Leer lassen für einen reinen Icon-Button.', 'b83-floating-buttons' ), 'label' );
+		$this->text_field( $uid . '-sub', $n . '[sublabel]', __( 'Zusatztext darunter (klein)', 'b83-floating-buttons' ), (string) $item['sublabel'], 100, __( 'z. B. +43 6243 1234', 'b83-floating-buttons' ), __( 'Optional, erscheint in kleiner Schrift unter der Überschrift.', 'b83-floating-buttons' ) );
+		echo '</div>';
+		echo '<div class="b83-fb-row">';
 		$this->text_field( $uid . '-tip', $n . '[tooltip]', __( 'Info-Text beim Drüberfahren', 'b83-floating-buttons' ), (string) $item['tooltip'], 200, __( 'z. B. Mo–Fr 8–17 Uhr erreichbar', 'b83-floating-buttons' ), __( 'Erscheint als Hinweisblase neben dem Button.', 'b83-floating-buttons' ) );
 		echo '</div>';
 
@@ -753,6 +780,7 @@ final class AdminPage {
 			'phone'    => __( 'Telefon anrufen', 'b83-floating-buttons' ),
 			'email'    => __( 'E-Mail schreiben', 'b83-floating-buttons' ),
 			'whatsapp' => __( 'WhatsApp-Chat', 'b83-floating-buttons' ),
+			'chat'     => __( 'Chat / Messenger', 'b83-floating-buttons' ),
 			'sms'      => __( 'SMS senden', 'b83-floating-buttons' ),
 			'top'      => __( 'Nach oben scrollen', 'b83-floating-buttons' ),
 			'none'     => __( 'Keine (nur Info)', 'b83-floating-buttons' ),
@@ -764,6 +792,10 @@ final class AdminPage {
 
 		echo '<div class="b83-fb-field b83-fb-when b83-fb-when-url">';
 		$this->text_input( $uid . '-url', $n . '[url]', __( 'Adresse', 'b83-floating-buttons' ), (string) $item['url'], 2000, 'https://… oder /kontakt/ oder #anfahrt', 'text' );
+		echo '</div>';
+		echo '<div class="b83-fb-field b83-fb-when b83-fb-when-chat">';
+		$this->text_input( $uid . '-chat', $n . '[chat_url]', __( 'Chat-Link', 'b83-floating-buttons' ), (string) $item['chat_url'], 2000, 'https://m.me/… · https://t.me/… · skype:name?chat', 'text' );
+		echo '<span class="description">' . esc_html__( 'Messenger, Telegram, Signal, Skype, Viber, Teams oder die Adresse eures Chat-Systems.', 'b83-floating-buttons' ) . '</span>';
 		echo '</div>';
 		echo '<div class="b83-fb-field b83-fb-when b83-fb-when-phone b83-fb-when-sms">';
 		$this->text_input( $uid . '-phone', $n . '[phone]', __( 'Telefonnummer', 'b83-floating-buttons' ), (string) $item['phone'], 40, '+43 6243 1234', 'tel' );
@@ -782,7 +814,7 @@ final class AdminPage {
 		echo '</div>';
 		echo '</div>';
 
-		echo '<div class="b83-fb-row b83-fb-when b83-fb-when-url b83-fb-when-whatsapp">';
+		echo '<div class="b83-fb-row b83-fb-when b83-fb-when-url b83-fb-when-whatsapp b83-fb-when-chat">';
 		echo '<label class="b83-fb-check"><input type="checkbox" name="' . esc_attr( $n . '[target_blank]' ) . '" value="1"' . checked( $item['target_blank'], true, false ) . '> ' . esc_html__( 'In neuem Fenster öffnen', 'b83-floating-buttons' ) . '</label>';
 		echo '<label class="b83-fb-check"><input type="checkbox" name="' . esc_attr( $n . '[nofollow]' ) . '" value="1"' . checked( $item['nofollow'], true, false ) . '> ' . esc_html__( 'nofollow (für Suchmaschinen nicht folgen)', 'b83-floating-buttons' ) . '</label>';
 		echo '<span class="description">' . esc_html__( 'Gilt nur für externe Adressen.', 'b83-floating-buttons' ) . '</span>';
@@ -805,6 +837,15 @@ final class AdminPage {
 	private function render_item_template(): void {
 		$item              = Sanitizer::item_defaults();
 		$item['link_type'] = 'url';
+		// Neue Buttons starten mit einem Font-Awesome-Icon.
+		$fa = FontAwesome::find( 's:phone' );
+		if ( null !== $fa ) {
+			$item['icon_type'] = 'fa';
+			$item['fa']        = 's:phone';
+			$item['fa_label']  = $fa['label'];
+			$item['fa_width']  = $fa['width'];
+			$item['fa_path']   = $fa['path'];
+		}
 		echo '<template id="b83-fb-item-template">';
 		$this->render_item( $item, '__INDEX__', true );
 		echo '</template>';
@@ -829,6 +870,29 @@ final class AdminPage {
 			echo '</div></div>';
 		}
 		echo '</div></div>';
+	}
+
+	/**
+	 * Auswahlfenster für Font Awesome. Die Icon-Liste wird erst beim ersten
+	 * Öffnen geladen und im Browser gefiltert.
+	 */
+	private function render_fa_picker(): void {
+		echo '<div class="b83-fb-picker b83-fb-picker--fa" id="b83-fb-fa-picker" hidden role="dialog" aria-label="' . esc_attr__( 'Font-Awesome-Icon wählen', 'b83-floating-buttons' ) . '">';
+		echo '<div class="b83-fb-picker__head"><input type="search" class="b83-fb-picker__search" data-role="fa-search" placeholder="' . esc_attr__( 'Suchen (englisch), z. B. phone, bed, ski …', 'b83-floating-buttons' ) . '" aria-label="' . esc_attr__( 'Icon suchen', 'b83-floating-buttons' ) . '">';
+		echo '<button type="button" class="b83-fb-icon-btn" data-role="picker-close"><span class="dashicons dashicons-no-alt"></span><span class="screen-reader-text">' . esc_html__( 'Schließen', 'b83-floating-buttons' ) . '</span></button></div>';
+		echo '<div class="b83-fb-picker__filter" role="radiogroup" aria-label="' . esc_attr__( 'Stil', 'b83-floating-buttons' ) . '">';
+		echo '<label><input type="radio" name="b83_fb_fa_style" value="" checked><span>' . esc_html__( 'Alle', 'b83-floating-buttons' ) . '</span></label>';
+		foreach ( array(
+			's' => __( 'Solid', 'b83-floating-buttons' ),
+			'r' => __( 'Regular', 'b83-floating-buttons' ),
+			'b' => __( 'Marken', 'b83-floating-buttons' ),
+		) as $value => $label ) {
+			echo '<label><input type="radio" name="b83_fb_fa_style" value="' . esc_attr( $value ) . '"><span>' . esc_html( $label ) . '</span></label>';
+		}
+		echo '</div>';
+		echo '<div class="b83-fb-picker__body"><div class="b83-fb-picker__grid" data-role="fa-grid"></div><p class="b83-fb-picker__note" data-role="fa-note"></p></div>';
+		echo '<div class="b83-fb-picker__foot">' . esc_html__( 'Icons: Font Awesome Free (fontawesome.com), Lizenz CC BY 4.0', 'b83-floating-buttons' ) . '</div>';
+		echo '</div>';
 	}
 
 	/* --- Position ----------------------------------------------------- */
@@ -879,7 +943,8 @@ final class AdminPage {
 		echo '</div>';
 
 		echo '<div class="b83-fb-row">';
-		$this->number_field( 'font_size', __( 'Schriftgröße', 'b83-floating-buttons' ), $group, 'px' );
+		$this->number_field( 'font_size', __( 'Schriftgröße Überschrift', 'b83-floating-buttons' ), $group, 'px' );
+		$this->number_field( 'sub_size', __( 'Schriftgröße Zusatztext', 'b83-floating-buttons' ), $group, 'px' );
 		$this->select_field(
 			'font_weight',
 			__( 'Schriftstärke', 'b83-floating-buttons' ),

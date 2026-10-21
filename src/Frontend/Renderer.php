@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace B83\FloatingButtons\Frontend;
 
+use B83\FloatingButtons\FontAwesome;
 use B83\FloatingButtons\Icons;
 use B83\FloatingButtons\Repository;
+use B83\FloatingButtons\Sanitizer;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -179,6 +181,12 @@ final class Renderer {
 	private function item_html( array $item, array $group ): string {
 		$id      = (string) $item['id'];
 		$label   = (string) $item['label'];
+		$sub     = (string) ( $item['sublabel'] ?? '' );
+		// Zusatztext ohne Überschrift wird selbst zur Überschrift.
+		if ( '' === $label && '' !== $sub ) {
+			$label = $sub;
+			$sub   = '';
+		}
 		$tooltip = $group['tooltips'] ? (string) $item['tooltip'] : '';
 		$link    = $this->link( $item );
 
@@ -205,12 +213,18 @@ final class Renderer {
 		}
 
 		// Zugänglicher Name: sichtbarer Text, sonst Info-Text bzw. Icon-Bezeichnung.
-		$name = $label;
+		$name = '' !== $sub ? $label . ' – ' . $sub : $label;
 		if ( '' === $name ) {
 			$name = '' !== (string) $item['tooltip'] ? (string) $item['tooltip'] : $this->icon_label( $item );
 		}
 
-		$html = '<li class="b83-fb__item' . ( '' === $label ? ' b83-fb__item--icon-only' : '' ) . '" data-b83-fb-item="' . esc_attr( $id ) . '">';
+		$classes = 'b83-fb__item';
+		if ( '' === $label ) {
+			$classes .= ' b83-fb__item--icon-only';
+		} elseif ( '' !== $sub ) {
+			$classes .= ' b83-fb__item--has-sub';
+		}
+		$html = '<li class="' . $classes . '" data-b83-fb-item="' . esc_attr( $id ) . '">';
 
 		$html .= '<' . $tag;
 		foreach ( $attrs as $attr => $value ) {
@@ -220,7 +234,12 @@ final class Renderer {
 
 		$html .= '<span class="b83-fb__icon">' . $this->media( $item ) . '</span>';
 		if ( '' !== $label ) {
-			$html .= '<span class="b83-fb__label"><span class="b83-fb__label-text">' . esc_html( $label ) . '</span></span>';
+			$html .= '<span class="b83-fb__label"><span class="b83-fb__label-text">';
+			$html .= '<span class="b83-fb__title">' . esc_html( $label ) . '</span>';
+			if ( '' !== $sub ) {
+				$html .= '<span class="b83-fb__sub">' . esc_html( $sub ) . '</span>';
+			}
+			$html .= '</span></span>';
 		} else {
 			$html .= '<span class="b83-fb__sr">' . esc_html( $name ) . '</span>';
 		}
@@ -261,11 +280,17 @@ final class Renderer {
 				return $img;
 			}
 		}
+		if ( 'fa' === $item['icon_type'] && '' !== (string) $item['fa_path'] ) {
+			return FontAwesome::svg( (int) $item['fa_width'], (string) $item['fa_path'] );
+		}
 		return $this->icons->svg( (string) $item['icon'] );
 	}
 
 	/** @param array<string,mixed> $item Button. */
 	private function icon_label( array $item ): string {
+		if ( 'fa' === $item['icon_type'] && '' !== (string) $item['fa_label'] ) {
+			return (string) $item['fa_label'];
+		}
 		$all = $this->icons->all();
 		return (string) ( $all[ (string) $item['icon'] ]['label'] ?? '' );
 	}
@@ -307,6 +332,10 @@ final class Renderer {
 						$href .= '?text=' . rawurlencode( (string) $item['whatsapp_text'] );
 					}
 				}
+				break;
+			case 'chat':
+				$href     = (string) $item['chat_url'];
+				$external = str_starts_with( $href, 'http' );
 				break;
 			case 'top':
 				$href = '#';
@@ -350,7 +379,7 @@ final class Renderer {
 
 	/** @return string[] Erlaubte Link-Protokolle. */
 	private function protocols(): array {
-		return array( 'http', 'https', 'mailto', 'tel', 'sms' );
+		return array_merge( array( 'http', 'https', 'mailto', 'tel', 'sms' ), Sanitizer::CHAT_PROTOCOLS );
 	}
 
 	/* ---------------------------------------------------------------------
@@ -377,6 +406,7 @@ final class Renderer {
 				'--b83fb-offset'    => (int) $group['align_offset'] . 'px',
 				'--b83fb-peek'      => (int) $group['peek'] . '%',
 				'--b83fb-font'      => (int) $group['font_size'] . 'px',
+				'--b83fb-sub'       => (int) $group['sub_size'] . 'px',
 				'--b83fb-weight'    => (int) $group['font_weight'],
 				'--b83fb-delay'     => (int) $group['delay'] . 'ms',
 				'--b83fb-dur'       => (int) $group['duration'] . 'ms',

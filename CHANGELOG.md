@@ -2,6 +2,14 @@
 
 Alle wichtigen Änderungen an b83 Floating Buttons. Versionen nach [Semantic Versioning](https://semver.org/lang/de/).
 
+## 1.1.0 – 2026-10-21
+
+- Neu: Icons aus Font Awesome Free 7 (über 2.100 Icons: Solid, Regular, Marken) mit Suche und Stil-Filter. Das gewählte Icon wird beim Speichern als SVG am Button abgelegt – im Frontend wird keine Font-Awesome-Schrift und kein zusätzliches CSS geladen
+- Neu: optionaler Zusatztext in kleiner Schrift unter der Überschrift, eigene Schriftgröße je Leiste
+- Neu: Aktion „Chat / Messenger“ für Messenger-, Telegram-, Signal-, Skype-, Viber- und Teams-Links sowie Chat-Systeme mit eigener Adresse
+- Schriftgröße der Überschrift bis 32 px einstellbar (bisher 24 px)
+- Neue Buttons starten mit einem Font-Awesome-Icon; bestehende Buttons bleiben unverändert
+
 ## 1.0.0 – 2026-10-16
 
 Erste Version.

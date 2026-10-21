@@ -112,6 +112,8 @@
 		var $img = $item.find( '[data-role="image-preview"] img' );
 		if ( 'image' === iconType && $img.length ) {
 			$thumb.html( $( '<img alt="">' ).attr( 'src', $img.attr( 'src' ) ) );
+		} else if ( 'fa' === iconType ) {
+			$thumb.html( $item.find( '[data-role="fa-preview"]' ).html() );
 		} else {
 			$thumb.html( $item.find( '[data-role="icon-preview"]' ).html() );
 		}
@@ -213,6 +215,7 @@
 
 	$items.on( 'click', '[data-role="pick-icon"]', function ( event ) {
 		event.stopPropagation();
+		closeFa();
 		var $btn = $( this );
 		if ( $pickerTarget && $pickerTarget.is( $btn.closest( '.b83-fb-item' ) ) && ! $picker.prop( 'hidden' ) ) {
 			closePicker();
@@ -274,6 +277,211 @@
 	} );
 
 	/* -----------------------------------------------------------------
+	 * Font Awesome: Liste beim ersten Öffnen laden, im Browser filtern
+	 * --------------------------------------------------------------- */
+	var $fa = $( '#b83-fb-fa-picker' );
+	var $faGrid = $fa.find( '[data-role="fa-grid"]' );
+	var $faNote = $fa.find( '[data-role="fa-note"]' );
+	var faIcons = null;
+	var faRequest = null;
+	var faTarget = null;
+	var faTimer = null;
+	var FA_LIMIT = 240;
+	var SVG_NS = 'http://www.w3.org/2000/svg';
+	var PATH_OK = /^[0-9MmLlHhVvCcSsQqTtAaZz.,\-\s]+$/;
+
+	function loadFa() {
+		if ( faIcons ) {
+			return Promise.resolve( faIcons );
+		}
+		if ( ! faRequest ) {
+			faRequest = window.fetch( cfg.faUrl, { credentials: 'same-origin' } )
+				.then( function ( response ) {
+					if ( ! response.ok ) {
+						throw new Error( 'HTTP ' + response.status );
+					}
+					return response.json();
+				} )
+				.then( function ( json ) {
+					// Zeile: Name, Stil, Bezeichnung, Suchbegriffe, Breite, Pfad.
+					faIcons = ( json.i || [] ).filter( function ( row ) {
+						return row.length >= 6 && PATH_OK.test( row[ 5 ] );
+					} ).map( function ( row ) {
+						return {
+							key: row[ 1 ] + ':' + row[ 0 ],
+							name: row[ 0 ],
+							style: row[ 1 ],
+							label: row[ 2 ],
+							hay: ( row[ 0 ] + ' ' + row[ 2 ] + ' ' + row[ 3 ] ).toLowerCase(),
+							width: parseInt( row[ 4 ], 10 ) || 512,
+							path: row[ 5 ]
+						};
+					} );
+					return faIcons;
+				} )
+				.catch( function ( error ) {
+					faRequest = null;
+					throw error;
+				} );
+		}
+		return faRequest;
+	}
+
+	// SVG per DOM aufbauen (kein HTML-String aus Daten).
+	function faSvg( icon ) {
+		var svg = document.createElementNS( SVG_NS, 'svg' );
+		svg.setAttribute( 'xmlns', SVG_NS );
+		svg.setAttribute( 'viewBox', '0 0 ' + icon.width + ' 512' );
+		svg.setAttribute( 'fill', 'currentColor' );
+		svg.setAttribute( 'aria-hidden', 'true' );
+		svg.setAttribute( 'focusable', 'false' );
+		var path = document.createElementNS( SVG_NS, 'path' );
+		path.setAttribute( 'd', icon.path );
+		svg.appendChild( path );
+		return svg;
+	}
+
+	function faStyleName( style ) {
+		return { s: 'Solid', r: 'Regular', b: 'Brand' }[ style ] || '';
+	}
+
+	function renderFa() {
+		if ( ! faIcons ) {
+			return;
+		}
+		var term = $.trim( $fa.find( '[data-role="fa-search"]' ).val() || '' ).toLowerCase();
+		var style = $fa.find( '[name="b83_fb_fa_style"]:checked' ).val() || '';
+		var current = faTarget ? faTarget.find( '[data-role="fa"]' ).val() : '';
+		var words = term.split( /\s+/ ).filter( Boolean );
+
+		var hits = faIcons.filter( function ( icon ) {
+			if ( style && icon.style !== style ) {
+				return false;
+			}
+			return words.every( function ( word ) {
+				return -1 !== icon.hay.indexOf( word );
+			} );
+		} );
+
+		// Treffer im Namen zuerst, exakte Treffer ganz vorne.
+		if ( term ) {
+			hits.sort( function ( a, b ) {
+				return rank( a ) - rank( b );
+			} );
+		}
+		function rank( icon ) {
+			if ( icon.name === term ) {
+				return 0;
+			}
+			if ( 0 === icon.name.indexOf( term ) ) {
+				return 1;
+			}
+			return -1 !== icon.name.indexOf( term ) ? 2 : 3;
+		}
+
+		var fragment = document.createDocumentFragment();
+		hits.slice( 0, FA_LIMIT ).forEach( function ( icon ) {
+			var btn = document.createElement( 'button' );
+			btn.type = 'button';
+			btn.className = 'b83-fb-picker__icon' + ( icon.key === current ? ' is-current' : '' );
+			btn.setAttribute( 'data-key', icon.key );
+			btn.title = icon.label + ' (' + faStyleName( icon.style ) + ')';
+			btn.appendChild( faSvg( icon ) );
+			var span = document.createElement( 'span' );
+			span.textContent = icon.label;
+			btn.appendChild( span );
+			fragment.appendChild( btn );
+		} );
+		$faGrid.empty().append( fragment );
+
+		if ( ! hits.length ) {
+			$faNote.text( i18n.faNone || '' );
+		} else if ( hits.length > FA_LIMIT ) {
+			$faNote.text( ( i18n.faMore || '' ).replace( '%1$d', FA_LIMIT ).replace( '%2$d', hits.length ) );
+		} else {
+			$faNote.text( '' );
+		}
+	}
+
+	function closeFa() {
+		$fa.prop( 'hidden', true );
+		faTarget = null;
+	}
+
+	$items.on( 'click', '[data-role="pick-fa"]', function ( event ) {
+		event.stopPropagation();
+		closePicker();
+		var $btn = $( this );
+		if ( faTarget && faTarget.is( $btn.closest( '.b83-fb-item' ) ) && ! $fa.prop( 'hidden' ) ) {
+			closeFa();
+			return;
+		}
+		faTarget = $btn.closest( '.b83-fb-item' );
+
+		var offset = $btn.offset();
+		var maxLeft = $( window ).width() - $fa.outerWidth() - 20;
+		$fa.css( {
+			top: offset.top + $btn.outerHeight() + 6,
+			left: Math.max( 10, Math.min( offset.left, maxLeft ) )
+		} ).prop( 'hidden', false );
+		$fa.find( '[data-role="fa-search"]' ).val( '' ).trigger( 'focus' );
+
+		if ( faIcons ) {
+			renderFa();
+			return;
+		}
+		$faGrid.empty();
+		$faNote.text( i18n.faLoading || '' );
+		loadFa().then( renderFa ).catch( function () {
+			$faNote.text( i18n.faError || '' );
+		} );
+	} );
+
+	$fa.on( 'click', function ( event ) {
+		event.stopPropagation();
+	} );
+
+	$fa.on( 'input', '[data-role="fa-search"]', function () {
+		window.clearTimeout( faTimer );
+		faTimer = window.setTimeout( renderFa, 120 );
+	} );
+	$fa.on( 'change', '[name="b83_fb_fa_style"]', renderFa );
+
+	$fa.on( 'click', '.b83-fb-picker__icon', function () {
+		if ( ! faTarget || ! faIcons ) {
+			return;
+		}
+		var key = $( this ).attr( 'data-key' );
+		var icon = faIcons.find( function ( entry ) {
+			return entry.key === key;
+		} );
+		if ( ! icon ) {
+			return;
+		}
+		faTarget.find( '[data-role="fa"]' ).val( icon.key );
+		faTarget.find( '[data-role="fa-preview"]' ).empty().append( faSvg( icon ) );
+		faTarget.find( '[data-role="fa-name"]' ).text( icon.label );
+		faTarget.find( '[data-role="icon-type"][value="fa"]' ).prop( 'checked', true );
+		refreshHead( faTarget );
+		markDirty();
+		closeFa();
+	} );
+
+	$fa.on( 'click', '[data-role="picker-close"]', closeFa );
+
+	$( document ).on( 'click', function () {
+		if ( ! $fa.prop( 'hidden' ) ) {
+			closeFa();
+		}
+	} );
+
+	$( document ).on( 'keydown', function ( event ) {
+		if ( 'Escape' === event.key && ! $fa.prop( 'hidden' ) ) {
+			closeFa();
+		}
+	} );
+
+	/* -----------------------------------------------------------------
 	 * Mediathek
 	 * --------------------------------------------------------------- */
 	$items.on( 'click', '[data-role="pick-image"]', function () {
@@ -300,7 +508,8 @@
 		var $item = $( this ).closest( '.b83-fb-item' );
 		$item.find( '[data-role="image-id"]' ).val( '0' );
 		$item.find( '[data-role="image-preview"]' ).empty();
-		$item.find( '[data-role="icon-type"][value="icon"]' ).prop( 'checked', true );
+		var fallback = $item.find( '[data-role="fa"]' ).val() ? 'fa' : 'icon';
+		$item.find( '[data-role="icon-type"][value="' + fallback + '"]' ).prop( 'checked', true );
 		refreshHead( $item );
 		markDirty();
 	} );
@@ -397,7 +606,7 @@
 			fitFrame();
 			return;
 		}
-		if ( $( event.target ).is( '.b83-fb-pagesearch, .b83-fb-picker__search' ) ) {
+		if ( $( event.target ).is( '.b83-fb-pagesearch, .b83-fb-picker__search, [name="b83_fb_fa_style"]' ) ) {
 			return;
 		}
 		markDirty();

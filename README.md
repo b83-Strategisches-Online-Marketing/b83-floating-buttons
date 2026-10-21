@@ -7,10 +7,11 @@ Buttons stehen fix am linken, rechten, oberen oder unteren Rand jeder Seite, zei
 ## Funktionen
 
 - **Leisten**: beliebig viele Gruppen von Buttons (max. 20), je Leiste ein Rand und eine Ausrichtung
-- **Grafik**: 76 mitgelieferte Icons (Inline-SVG) oder eigene Grafik aus der Mediathek
+- **Grafik**: über 2.100 Font-Awesome-Free-Icons (Solid, Regular, Marken) mit Suche, 76 b83-Icons oder eigenes Bild aus der Mediathek – alles als Inline-SVG, ohne Icon-Schrift
+- **Texte**: Überschrift beim Ausklappen, optional kleiner Zusatztext darunter (Schriftgrößen getrennt einstellbar)
 - **Ausklappen**: Text erscheint verzögert beim Drüberfahren, Buttons können eingeklappt teils im Rand verborgen sein
 - **Info-Text** als Hinweisblase
-- **Aktionen**: Link, Telefon, E-Mail, WhatsApp, SMS, nach oben scrollen, nur Info; neues Fenster und nofollow wählbar
+- **Aktionen**: Link, Telefon, E-Mail, WhatsApp, Chat/Messenger (Messenger, Telegram, Signal, Skype, Viber, Teams), SMS, nach oben scrollen, nur Info; neues Fenster und nofollow wählbar
 - **Gestaltung**: Größe, Radius, Schatten, Schrift, Farben normal/Mouseover, je Button eigene Farben
 - **Responsiv**: Geräte einzeln ein-/ausblenden; mobil wie Desktop, nur Icons oder Leiste am unteren Rand
 - **Barrierearm**: Tastatur (Tab, Enter, Esc), Screenreader-Texte, `prefers-reduced-motion`
@@ -27,7 +28,7 @@ Updates erscheinen danach automatisch unter *Dashboard → Aktualisierungen* (au
 
 ## Anpassung im Theme
 
-Feste CSS-Klassen: `.b83-fb` (Leiste, zusätzlich `.b83-fb--left|right|top|bottom`), `.b83-fb__item`, `.b83-fb__btn`, `.b83-fb__icon`, `.b83-fb__label`, `.b83-fb__tip`. Jede Leiste hat die ID `#b83-fb-<id>`, jeder Button das Attribut `data-b83-fb-item="<id>"`. Gestaltung über CSS-Variablen `--b83fb-…` (siehe `assets/css/frontend.css`).
+Feste CSS-Klassen: `.b83-fb` (Leiste, zusätzlich `.b83-fb--left|right|top|bottom`), `.b83-fb__item`, `.b83-fb__btn`, `.b83-fb__icon`, `.b83-fb__label`, `.b83-fb__title` (Überschrift), `.b83-fb__sub` (Zusatztext), `.b83-fb__tip`. Jede Leiste hat die ID `#b83-fb-<id>`, jeder Button das Attribut `data-b83-fb-item="<id>"`. Gestaltung über CSS-Variablen `--b83fb-…` (siehe `assets/css/frontend.css`).
 
 ## Hooks für Entwickler
 
@@ -58,4 +59,4 @@ Optionen `b83_floating_buttons_groups` (Leisten, automatisch geladen), `b83_floa
 
 ## Lizenzen
 
-Plugin: GPL-2.0-or-later. Icons: [Lucide](https://lucide.dev) (ISC), [Simple Icons](https://simpleicons.org) (CC0). Markennamen und -logos gehören den jeweiligen Inhabern.
+Plugin: GPL-2.0-or-later. Icons: [Font Awesome Free](https://fontawesome.com) 7.3.1 (Icons CC BY 4.0, siehe `assets/fontawesome/LICENSE.txt`), [Lucide](https://lucide.dev) (ISC), [Simple Icons](https://simpleicons.org) (CC0). Markennamen und -logos gehören den jeweiligen Inhabern.

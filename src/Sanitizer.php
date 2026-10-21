@@ -25,8 +25,11 @@ final class Sanitizer {
 	public const SHADOWS       = array( 'none', 'soft', 'strong' );
 	public const ENTRANCES     = array( 'none', 'fade', 'slide' );
 	public const MOBILE_LAYOUT = array( 'same', 'compact', 'bar' );
-	public const ICON_TYPES    = array( 'icon', 'image' );
-	public const LINK_TYPES    = array( 'url', 'email', 'phone', 'whatsapp', 'sms', 'top', 'none' );
+	public const ICON_TYPES    = array( 'icon', 'fa', 'image' );
+	public const LINK_TYPES    = array( 'url', 'email', 'phone', 'whatsapp', 'chat', 'sms', 'top', 'none' );
+
+	/** App-Protokolle für Chat-Links (zusätzlich zu https). */
+	public const CHAT_PROTOCOLS = array( 'skype', 'viber', 'tg', 'msteams', 'sgnl' );
 	public const FONT_WEIGHTS  = array( '400', '600', '700' );
 
 	/** Farbfelder einer Leiste. */
@@ -48,7 +51,8 @@ final class Sanitizer {
 		'icon_size'    => array( 30, 90, 50 ),
 		'radius'       => array( 0, 60, 10 ),
 		'peek'         => array( 0, 60, 0 ),
-		'font_size'    => array( 11, 24, 15 ),
+		'font_size'    => array( 11, 32, 15 ),
+		'sub_size'     => array( 9, 24, 12 ),
 		'delay'        => array( 0, 1500, 150 ),
 		'duration'     => array( 100, 1000, 300 ),
 		'mobile_size'  => array( 32, 80, 44 ),
@@ -102,9 +106,14 @@ final class Sanitizer {
 			'id'             => '',
 			'active'         => true,
 			'label'          => '',
+			'sublabel'       => '',
 			'tooltip'        => '',
 			'icon_type'      => 'icon',
 			'icon'           => 'phone',
+			'fa'             => '',
+			'fa_label'       => '',
+			'fa_width'       => 0,
+			'fa_path'        => '',
 			'image_id'       => 0,
 			'link_type'      => 'url',
 			'url'            => '',
@@ -113,6 +122,7 @@ final class Sanitizer {
 			'phone'          => '',
 			'whatsapp'       => '',
 			'whatsapp_text'  => '',
+			'chat_url'       => '',
 			'target_blank'   => false,
 			'nofollow'       => false,
 			'bg'             => '',
@@ -187,15 +197,21 @@ final class Sanitizer {
 		$i['id']        = self::id( $raw['id'] ?? '', 'b' );
 		$i['active']    = self::bool( $raw['active'] ?? false );
 		$i['label']     = self::text( $raw['label'] ?? '', 60 );
+		$i['sublabel']  = self::text( $raw['sublabel'] ?? '', 100 );
 		$i['tooltip']   = self::text( $raw['tooltip'] ?? '', 200 );
 		$i['icon_type'] = self::choice( $raw['icon_type'] ?? '', self::ICON_TYPES, $d['icon_type'] );
 
 		$icon      = sanitize_key( (string) ( $raw['icon'] ?? '' ) );
 		$i['icon'] = $icons->exists( $icon ) ? $icon : $d['icon'];
 
+		self::font_awesome( $raw, $i );
+
 		$image_id      = self::int( $raw['image_id'] ?? 0, 0, PHP_INT_MAX );
 		$i['image_id'] = ( $image_id > 0 && wp_attachment_is_image( $image_id ) ) ? $image_id : 0;
 		if ( 'image' === $i['icon_type'] && 0 === $i['image_id'] ) {
+			$i['icon_type'] = 'icon';
+		}
+		if ( 'fa' === $i['icon_type'] && '' === $i['fa_path'] ) {
 			$i['icon_type'] = 'icon';
 		}
 
@@ -207,6 +223,7 @@ final class Sanitizer {
 		$i['phone']         = self::phone( $raw['phone'] ?? '' );
 		$i['whatsapp']      = preg_replace( '/\D+/', '', self::text( $raw['whatsapp'] ?? '', 30 ) ) ?? '';
 		$i['whatsapp_text'] = self::text( $raw['whatsapp_text'] ?? '', 300 );
+		$i['chat_url']      = self::chat_url( $raw['chat_url'] ?? '' );
 		$i['target_blank']  = self::bool( $raw['target_blank'] ?? false );
 		$i['nofollow']      = self::bool( $raw['nofollow'] ?? false );
 
@@ -215,6 +232,44 @@ final class Sanitizer {
 		}
 
 		return $i;
+	}
+
+	/**
+	 * Font-Awesome-Icon übernehmen. Das Formular sendet nur den Schlüssel –
+	 * Pfad und Bezeichnung werden dann aus der mitgelieferten Liste geholt.
+	 * Bereits gespeicherte Buttons (Duplizieren, Aktivieren, Import) bringen
+	 * einen Pfad mit; der wird nur übernommen, wenn er ausschließlich aus
+	 * SVG-Pfadbefehlen besteht.
+	 *
+	 * @param array<mixed>        $raw Rohdaten.
+	 * @param array<string,mixed> $i   Bereinigter Button (wird ergänzt).
+	 */
+	private static function font_awesome( array $raw, array &$i ): void {
+		$i['fa']       = FontAwesome::normalize( $raw['fa'] ?? '' );
+		$i['fa_label'] = '';
+		$i['fa_width'] = 0;
+		$i['fa_path']  = '';
+		if ( '' === $i['fa'] ) {
+			return;
+		}
+
+		$stored_path  = FontAwesome::clean_path( $raw['fa_path'] ?? '' );
+		$stored_width = self::int( $raw['fa_width'] ?? 0, 0, 1024 );
+		if ( '' !== $stored_path && $stored_width > 0 ) {
+			$i['fa_label'] = self::text( $raw['fa_label'] ?? '', 80 );
+			$i['fa_width'] = $stored_width;
+			$i['fa_path']  = $stored_path;
+			return;
+		}
+
+		$icon = FontAwesome::find( $i['fa'] );
+		if ( null === $icon ) {
+			$i['fa'] = '';
+			return;
+		}
+		$i['fa_label'] = self::text( $icon['label'], 80 );
+		$i['fa_width'] = $icon['width'];
+		$i['fa_path']  = FontAwesome::clean_path( $icon['path'] );
 	}
 
 	/**
@@ -312,6 +367,24 @@ final class Sanitizer {
 			$value = 'https://' . $value;
 		}
 		return esc_url_raw( $value, array( 'http', 'https' ) );
+	}
+
+	/**
+	 * Chat-Link: Webadresse (z. B. m.me/…, t.me/…, signal.me/…) oder ein
+	 * Messenger-Protokoll aus CHAT_PROTOCOLS (skype:…, viber:…, tg:…).
+	 *
+	 * @param mixed $value Rohwert.
+	 */
+	public static function chat_url( $value ): string {
+		$value = self::text( $value, 2000 );
+		if ( '' === $value ) {
+			return '';
+		}
+		if ( preg_match( '#^([a-z][a-z0-9+.\-]*):(?!//)#i', $value, $m ) && in_array( strtolower( $m[1] ), self::CHAT_PROTOCOLS, true ) ) {
+			return esc_url_raw( $value, self::CHAT_PROTOCOLS );
+		}
+		$url = self::url( $value );
+		return str_starts_with( $url, 'http' ) ? $url : '';
 	}
 
 	/**
