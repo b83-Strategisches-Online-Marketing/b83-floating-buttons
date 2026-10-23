@@ -2,6 +2,11 @@
 
 Alle wichtigen Änderungen an b83 Floating Buttons. Versionen nach [Semantic Versioning](https://semver.org/lang/de/).
 
+## 1.1.1 – 2026-10-23
+
+- Behoben: Globale Link-Farben aus Theme oder Elementor (Website-Einstellungen → Globale Farben/Links) überschrieben die Icon-Farbe der Buttons. Hintergrund-, Icon-, Text- und Info-Text-Farben aus dem Plugin haben jetzt immer Vorrang
+- Icons und Texte zusätzlich gegen allgemeine Theme-Regeln wie „svg { fill: … }“ oder „a span { color: … }“ abgesichert
+
 ## 1.1.0 – 2026-10-21
 
 - Neu: Icons aus Font Awesome Free 7 (über 2.100 Icons: Solid, Regular, Marken) mit Suche und Stil-Filter. Das gewählte Icon wird beim Speichern als SVG am Button abgelegt – im Frontend wird keine Font-Awesome-Schrift und kein zusätzliches CSS geladen

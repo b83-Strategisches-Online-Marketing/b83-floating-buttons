@@ -115,6 +115,10 @@
 .b83-fb__btn {
 	--b83fb-tx: 0;
 	--b83fb-ty: 0;
+	/* Aktuelle Farben – Zustände (Hover, offen, Fokus) ändern nur diese Variablen */
+	--b83fb-cur-bg: var(--b83fb-bg);
+	--b83fb-cur-color: var(--b83fb-color);
+	--b83fb-cur-text: var(--b83fb-text);
 
 	position: absolute;
 	top: 0;
@@ -126,8 +130,14 @@
 	padding: 0;
 	border: 0;
 	border-radius: var(--b83fb-radius);
-	background: var(--b83fb-bg);
-	color: var(--b83fb-color);
+	/*
+	 * !important schützt vor globalen Link-Farben aus Theme und Elementor
+	 * (z. B. „.elementor-kit-5 a { color: … }“ aus den Website-Einstellungen).
+	 * Eigene Anpassungen weiterhin über die Variablen --b83fb-… möglich.
+	 */
+	background-color: var(--b83fb-cur-bg) !important;
+	background-image: none !important;
+	color: var(--b83fb-cur-color) !important;
 	box-shadow: var(--b83fb-shadow);
 	font-size: var(--b83fb-font);
 	font-weight: var(--b83fb-weight);
@@ -184,6 +194,7 @@ span.b83-fb__btn { cursor: default; }
 .b83-fb--bottom .b83-fb__btn { --b83fb-ty: var(--b83fb-peek); }
 
 .b83-fb__icon {
+	color: var(--b83fb-cur-color) !important;
 	display: flex;
 	flex: 0 0 var(--b83fb-s);
 	align-items: center;
@@ -192,6 +203,19 @@ span.b83-fb__btn { cursor: default; }
 	height: var(--b83fb-s);
 	transition: color var(--b83fb-dur) ease;
 }
+
+.b83-fb__icon svg { color: inherit !important; }
+
+/* Icon-Farbe gegen Theme-Regeln wie „svg { fill: … }“ absichern */
+.b83-fb__icon svg[fill="currentColor"],
+.b83-fb__icon svg[fill="currentColor"] * { fill: currentColor !important; stroke: none !important; }
+.b83-fb__icon svg[stroke="currentColor"],
+.b83-fb__icon svg[stroke="currentColor"] * { fill: none !important; stroke: currentColor !important; }
+.b83-fb__icon svg[stroke="currentColor"] [fill="currentColor"] { fill: currentColor !important; }
+
+/* Texte im Button: keine Farben aus Regeln wie „a span“ übernehmen */
+.b83-fb__label *,
+.b83-fb__tip * { color: inherit !important; }
 
 .b83-fb__icon svg,
 .b83-fb__icon .b83-fb__img {
@@ -208,7 +232,7 @@ span.b83-fb__btn { cursor: default; }
 	overflow: hidden;
 	max-width: 0;
 	opacity: 0;
-	color: var(--b83fb-text);
+	color: var(--b83fb-cur-text) !important;
 	transition:
 		max-width var(--b83fb-dur) var(--b83fb-ease),
 		opacity calc(var(--b83fb-dur) * .7) ease,
@@ -242,13 +266,13 @@ span.b83-fb__btn { cursor: default; }
 @media (hover: hover) {
 	.b83-fb__item:hover .b83-fb__btn {
 		z-index: 2;
-		background: var(--b83fb-bg-h);
-		color: var(--b83fb-color-h);
+		--b83fb-cur-bg: var(--b83fb-bg-h);
+		--b83fb-cur-color: var(--b83fb-color-h);
+		--b83fb-cur-text: var(--b83fb-text-h);
 	}
 	.b83-fb__item:hover .b83-fb__label {
 		max-width: var(--b83fb-label-max);
 		opacity: 1;
-		color: var(--b83fb-text-h);
 		transition-delay: var(--b83fb-delay), var(--b83fb-delay), 0s;
 	}
 	.b83-fb--left .b83-fb__item:hover .b83-fb__btn,
@@ -260,14 +284,14 @@ span.b83-fb__btn { cursor: default; }
 .b83-fb__item.is-open .b83-fb__btn,
 .b83-fb__btn:focus-visible {
 	z-index: 2;
-	background: var(--b83fb-bg-h);
-	color: var(--b83fb-color-h);
+	--b83fb-cur-bg: var(--b83fb-bg-h);
+	--b83fb-cur-color: var(--b83fb-color-h);
+	--b83fb-cur-text: var(--b83fb-text-h);
 }
 .b83-fb__item.is-open .b83-fb__label,
 .b83-fb__btn:focus-visible .b83-fb__label {
 	max-width: var(--b83fb-label-max);
 	opacity: 1;
-	color: var(--b83fb-text-h);
 }
 .b83-fb--left .b83-fb__item.is-open .b83-fb__btn,
 .b83-fb--right .b83-fb__item.is-open .b83-fb__btn,
@@ -289,8 +313,8 @@ span.b83-fb__btn { cursor: default; }
 	max-width: min(260px, 70vw);
 	padding: .55em .8em;
 	border-radius: 6px;
-	background: var(--b83fb-tip-bg);
-	color: var(--b83fb-tip-color);
+	background: var(--b83fb-tip-bg) !important;
+	color: var(--b83fb-tip-color) !important;
 	box-shadow: 0 4px 14px rgba(0, 0, 0, .2);
 	font-size: max(12px, calc(var(--b83fb-font) * .85));
 	font-weight: 400;
