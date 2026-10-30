@@ -2,6 +2,21 @@
 
 Alle wichtigen Änderungen an b83 Floating Buttons. Versionen nach [Semantic Versioning](https://semver.org/lang/de/).
 
+## 2.0.1 – 2026-10-30
+
+- Neu zu Freemius hochgeladen, nachdem der Pro-Plan angelegt war (2.0.0 hatte keine Pro-Version)
+
+## 2.0.0 – 2026-10-30
+
+- Wird Freemium-Plugin: Gratisversion über wordpress.org, Pro mit Lizenz über Freemius (Testphase 30 Tage)
+- Neu in Pro: Öffnungszeiten je Button (cachefest, im Browser geprüft, Zeitzone der Website)
+- Neu in Pro: Anzeigeregeln je Leiste (nur auf bestimmten Seiten, Inhaltstypen oder Sprachen mit WPML/Polylang)
+- Neu in Pro: Klick-Tracking als Ereignis für Google Analytics 4 und den Google Tag Manager
+- Texte im Code englisch, deutsche Übersetzung mitgeliefert (de_DE, de_AT, de_CH)
+- Updates nicht mehr über GitHub, sondern über wordpress.org bzw. Freemius
+- Neuer Filter `b83_floating_buttons_item_attributes` für die Attribute eines Buttons
+- Einstellungen und Leisten bleiben beim Umstieg unverändert erhalten
+
 ## 1.1.1 – 2026-10-23
 
 - Behoben: Globale Link-Farben aus Theme oder Elementor (Website-Einstellungen → Globale Farben/Links) überschrieben die Icon-Farbe der Buttons. Hintergrund-, Icon-, Text- und Info-Text-Farben aus dem Plugin haben jetzt immer Vorrang

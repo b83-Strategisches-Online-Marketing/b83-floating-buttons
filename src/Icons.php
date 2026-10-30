@@ -29,8 +29,8 @@ final class Icons {
 		$icons = array();
 		foreach ( IconLibrary::raw() as $key => $row ) {
 			$icons[ $key ] = array(
-				'label' => $row[0],
-				'group' => $row[1],
+				'label' => IconLabels::translate( $row[0] ),
+				'group' => IconLabels::translate( $row[1] ),
 				'mode'  => $row[2],
 				'svg'   => $row[3],
 			);
@@ -53,7 +53,7 @@ final class Icons {
 			}
 			$this->icons[ $key ] = array(
 				'label' => (string) ( $icon['label'] ?? $key ),
-				'group' => (string) ( $icon['group'] ?? __( 'Eigene', 'b83-floating-buttons' ) ),
+				'group' => (string) ( $icon['group'] ?? __( 'Custom', 'b83-floating-buttons' ) ),
 				'mode'  => 'stroke' === ( $icon['mode'] ?? '' ) ? 'stroke' : 'fill',
 				'svg'   => (string) $icon['svg'],
 			);

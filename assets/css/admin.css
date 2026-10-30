@@ -440,3 +440,40 @@
 .b83-fb-picker__note { margin: 10px 0 0; color: var(--b83a-muted); font-size: 12px; }
 .b83-fb-picker__note:empty { display: none; }
 .b83-fb-picker__foot { padding: 6px 12px; border-top: 1px solid var(--b83a-border); color: var(--b83a-muted); font-size: 11px; }
+
+/* Pro-Hinweise */
+.b83-fb-pro-box {
+	max-width: 760px;
+	margin-top: 20px;
+	border-left: 4px solid #f09426;
+}
+
+.b83-fb-pro-box ul {
+	list-style: disc;
+	margin-left: 20px;
+}
+
+.b83-fb-pro-hint {
+	margin-top: 12px;
+	color: #50575e;
+}
+
+.b83-fb-pro-badge {
+	display: inline-block;
+	padding: 0 6px;
+	border-radius: 9px;
+	background: #f09426;
+	color: #fff;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 18px;
+	vertical-align: middle;
+}
+
+.b83-fb-hours {
+	display: grid;
+	grid-template-columns: max-content minmax(0, 1fr);
+	gap: 6px 12px;
+	align-items: center;
+	max-width: 520px;
+}

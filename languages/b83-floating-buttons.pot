@@ -1,0 +1,1258 @@
+# Copyright (C) 2026 b83 – Wolfgang Grabs-Schrempf
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: b83 Floating Buttons 2.0.0\n"
+"Report-Msgid-Bugs-To: office@b83.at\n"
+"POT-Creation-Date: 2026-10-30 14:55+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: b83-floating-buttons\n"
+
+#: src/Icons.php:56
+msgid "Custom"
+msgstr ""
+
+#: src/IconLabels.php:31
+msgid "Accessible"
+msgstr ""
+
+#: src/IconLabels.php:32
+msgid "Appointment / booking"
+msgstr ""
+
+#: src/IconLabels.php:33
+msgid "Arrow up"
+msgstr ""
+
+#: src/IconLabels.php:34 src/Admin/AdminPage.php:154
+msgid "Back to top"
+msgstr ""
+
+#: src/IconLabels.php:35
+msgid "Bell"
+msgstr ""
+
+#: src/IconLabels.php:36
+msgid "Bicycle"
+msgstr ""
+
+#: src/IconLabels.php:37
+msgid "Booking & shop"
+msgstr ""
+
+#: src/IconLabels.php:38
+msgid "Bus"
+msgstr ""
+
+#: src/IconLabels.php:39
+msgid "Cable car"
+msgstr ""
+
+#: src/IconLabels.php:40
+msgid "Café"
+msgstr ""
+
+#: src/IconLabels.php:41
+msgid "Calendar"
+msgstr ""
+
+#: src/IconLabels.php:42
+msgid "Car"
+msgstr ""
+
+#: src/IconLabels.php:43
+msgid "Check mark"
+msgstr ""
+
+#: src/IconLabels.php:44
+msgid "Contact"
+msgstr ""
+
+#: src/IconLabels.php:45
+msgid "Customer service"
+msgstr ""
+
+#: src/IconLabels.php:46
+msgid "Discount"
+msgstr ""
+
+#: src/IconLabels.php:47
+msgid "Document / PDF"
+msgstr ""
+
+#: src/IconLabels.php:48
+msgid "Download"
+msgstr ""
+
+#: src/IconLabels.php:49 src/Admin/AdminPage.php:150
+msgid "Email"
+msgstr ""
+
+#: src/IconLabels.php:50
+msgid "External link"
+msgstr ""
+
+#: src/IconLabels.php:51 src/Admin/AdminPage.php:571
+msgid "General"
+msgstr ""
+
+#: src/IconLabels.php:52
+msgid "Heart"
+msgstr ""
+
+#: src/IconLabels.php:53
+msgid "Help"
+msgstr ""
+
+#: src/IconLabels.php:54
+msgid "Highlight"
+msgstr ""
+
+#: src/IconLabels.php:55
+msgid "Home"
+msgstr ""
+
+#: src/IconLabels.php:56
+msgid "Hotel"
+msgstr ""
+
+#: src/IconLabels.php:57
+msgid "Info"
+msgstr ""
+
+#: src/IconLabels.php:58 src/Admin/AdminPage.php:148
+msgid "Link"
+msgstr ""
+
+#: src/IconLabels.php:59
+msgid "Location"
+msgstr ""
+
+#: src/IconLabels.php:60
+msgid "Location & travel"
+msgstr ""
+
+#: src/IconLabels.php:61
+msgid "Map"
+msgstr ""
+
+#: src/IconLabels.php:62
+msgid "Message"
+msgstr ""
+
+#: src/IconLabels.php:63
+msgid "Mountain"
+msgstr ""
+
+#: src/IconLabels.php:64
+msgid "Nature"
+msgstr ""
+
+#: src/IconLabels.php:65
+msgid "Navigation"
+msgstr ""
+
+#: src/IconLabels.php:66
+msgid "Offer"
+msgstr ""
+
+#: src/IconLabels.php:67
+msgid "Parking"
+msgstr ""
+
+#: src/IconLabels.php:68
+msgid "People"
+msgstr ""
+
+#: src/IconLabels.php:69
+msgid "Person"
+msgstr ""
+
+#: src/IconLabels.php:70 src/Admin/AdminPage.php:149
+msgid "Phone"
+msgstr ""
+
+#: src/IconLabels.php:71
+msgid "Phone (call)"
+msgstr ""
+
+#: src/IconLabels.php:72
+msgid "Prices"
+msgstr ""
+
+#: src/IconLabels.php:73
+msgid "Restaurant"
+msgstr ""
+
+#: src/IconLabels.php:74
+msgid "Room"
+msgstr ""
+
+#: src/IconLabels.php:75
+msgid "Route"
+msgstr ""
+
+#: src/IconLabels.php:76
+msgid "Search"
+msgstr ""
+
+#: src/IconLabels.php:77
+msgid "Send"
+msgstr ""
+
+#: src/IconLabels.php:78
+msgid "Share"
+msgstr ""
+
+#: src/IconLabels.php:79
+msgid "Shop"
+msgstr ""
+
+#: src/IconLabels.php:80
+msgid "Shopping cart"
+msgstr ""
+
+#: src/IconLabels.php:81
+msgid "Smartphone"
+msgstr ""
+
+#: src/IconLabels.php:82
+msgid "Snow"
+msgstr ""
+
+#: src/IconLabels.php:83
+msgid "Social media & brands"
+msgstr ""
+
+#: src/IconLabels.php:84
+msgid "Speech bubble"
+msgstr ""
+
+#: src/IconLabels.php:85
+msgid "Star"
+msgstr ""
+
+#: src/IconLabels.php:86
+msgid "Sun"
+msgstr ""
+
+#: src/IconLabels.php:87
+msgid "Ticket"
+msgstr ""
+
+#: src/IconLabels.php:88
+msgid "Time / opening hours"
+msgstr ""
+
+#: src/IconLabels.php:89
+msgid "Tourism & weather"
+msgstr ""
+
+#: src/IconLabels.php:90
+msgid "Video"
+msgstr ""
+
+#: src/IconLabels.php:91
+msgid "Voucher"
+msgstr ""
+
+#: src/IconLabels.php:92
+msgid "Weather"
+msgstr ""
+
+#: src/IconLabels.php:93
+msgid "Webcam / photo"
+msgstr ""
+
+#: src/IconLabels.php:94
+msgid "Website / language"
+msgstr ""
+
+#: src/Sanitizer.php:76 src/Admin/AdminPage.php:423
+msgid "New bar"
+msgstr ""
+
+#: src/Pro/Hours.php:97
+msgid "Monday"
+msgstr ""
+
+#: src/Pro/Hours.php:98
+msgid "Tuesday"
+msgstr ""
+
+#: src/Pro/Hours.php:99
+msgid "Wednesday"
+msgstr ""
+
+#: src/Pro/Hours.php:100
+msgid "Thursday"
+msgstr ""
+
+#: src/Pro/Hours.php:101
+msgid "Friday"
+msgstr ""
+
+#: src/Pro/Hours.php:102
+msgid "Saturday"
+msgstr ""
+
+#: src/Pro/Hours.php:103
+msgid "Sunday"
+msgstr ""
+
+#: src/Pro/Hours.php:109
+msgid "Opening hours"
+msgstr ""
+
+#: src/Pro/Hours.php:114
+msgid "Show this button only during these times"
+msgstr ""
+
+#: src/Pro/Hours.php:125
+msgid "e.g. 08:00-12:00, 13:00-17:00"
+msgstr ""
+
+#: src/Pro/Hours.php:130
+#, php-format
+msgid "Empty = closed on that day. Up to three time ranges per day. Time zone of the website: %s."
+msgstr ""
+
+#: src/Pro/Tracking.php:53
+msgid "Click tracking"
+msgstr ""
+
+#: src/Pro/Tracking.php:57
+msgid "Send every button click as an event to Google Analytics 4 or Google Tag Manager"
+msgstr ""
+
+#: src/Pro/Tracking.php:61
+msgid "Event name"
+msgstr ""
+
+#: src/Pro/Tracking.php:64
+msgid "Parameters: bar_name, button_label, button_action (link, phone, email, whatsapp …) and link_url for links. In Google Tag Manager, use a trigger of type \"Custom event\" with this event name. The plugin sets no cookies; consent is handled by your cookie banner as usual."
+msgstr ""
+
+#: src/Pro/Rules.php:114
+msgid "Show only on"
+msgstr ""
+
+#: src/Pro/Rules.php:115
+msgid "Leave everything empty to show the bar everywhere. If you choose pages or content types, the bar appears only where at least one of them matches."
+msgstr ""
+
+#: src/Pro/Rules.php:121
+msgid "Content types"
+msgstr ""
+
+#: src/Pro/Rules.php:142
+msgid "Pages"
+msgstr ""
+
+#: src/Pro/Rules.php:143 src/Admin/AdminPage.php:1112
+msgid "Filter pages …"
+msgstr ""
+
+#: src/Pro/Rules.php:143 src/Admin/AdminPage.php:1112
+msgid "Filter pages"
+msgstr ""
+
+#: src/Pro/Rules.php:153 src/Admin/AdminPage.php:1118
+msgid "(no title)"
+msgstr ""
+
+#: src/Pro/Rules.php:158 src/Admin/AdminPage.php:1123
+msgid "More IDs (posts, products …), separated by commas"
+msgstr ""
+
+#: src/Pro/Rules.php:166
+msgid "Languages"
+msgstr ""
+
+#: src/Pro/Rules.php:175
+msgid "None selected = all languages."
+msgstr ""
+
+#: src/Admin/AdminPage.php:63 src/Admin/AdminPage.php:64 src/Admin/AdminPage.php:421
+msgid "Floating Buttons"
+msgstr ""
+
+#: src/Admin/AdminPage.php:85
+msgid "Settings"
+msgstr ""
+
+#: src/Admin/AdminPage.php:129
+msgid "Choose a graphic for the button"
+msgstr ""
+
+#: src/Admin/AdminPage.php:130
+msgid "Use graphic"
+msgstr ""
+
+#: src/Admin/AdminPage.php:131
+msgid "Remove this button?"
+msgstr ""
+
+#: src/Admin/AdminPage.php:132 src/Admin/AdminPage.php:767
+msgid "(no text)"
+msgstr ""
+
+#: src/Admin/AdminPage.php:135
+#, php-format
+msgid "At most %d buttons per bar."
+msgstr ""
+
+#: src/Admin/AdminPage.php:138
+msgid "The preview could not be loaded."
+msgstr ""
+
+#: src/Admin/AdminPage.php:139
+msgid "Loading icons …"
+msgstr ""
+
+#: src/Admin/AdminPage.php:140
+msgid "The icon list could not be loaded."
+msgstr ""
+
+#: src/Admin/AdminPage.php:141
+msgid "No icon found. Search in English, e.g. \"phone\", \"bed\", \"ski\"."
+msgstr ""
+
+#: src/Admin/AdminPage.php:143
+#, php-format
+msgid "%1$d of %2$d results. Refine your search to see more."
+msgstr ""
+
+#: src/Admin/AdminPage.php:144 src/Admin/AdminPage.php:796 src/Admin/AdminPage.php:913
+msgid "Choose icon"
+msgstr ""
+
+#: src/Admin/AdminPage.php:151
+msgid "WhatsApp"
+msgstr ""
+
+#: src/Admin/AdminPage.php:152
+msgid "Chat"
+msgstr ""
+
+#: src/Admin/AdminPage.php:153
+msgid "SMS"
+msgstr ""
+
+#: src/Admin/AdminPage.php:155
+msgid "Info only"
+msgstr ""
+
+#: src/Admin/AdminPage.php:167 src/Admin/AdminPage.php:404 src/Admin/B83Menu.php:106
+msgid "You are not allowed to do this."
+msgstr ""
+
+#: src/Admin/AdminPage.php:235
+#, php-format
+msgid "%s (copy)"
+msgstr ""
+
+#: src/Admin/AdminPage.php:429
+msgid "Bars"
+msgstr ""
+
+#: src/Admin/AdminPage.php:430
+msgid "Settings & export"
+msgstr ""
+
+#: src/Admin/AdminPage.php:431
+msgid "Account & license"
+msgstr ""
+
+#: src/Admin/AdminPage.php:452
+#, php-format
+msgid "Bar saved. The %s cache was cleared."
+msgstr ""
+
+#: src/Admin/AdminPage.php:453
+msgid "Bar saved."
+msgstr ""
+
+#: src/Admin/AdminPage.php:454
+msgid "Bar deleted."
+msgstr ""
+
+#: src/Admin/AdminPage.php:455
+msgid "Bar activated."
+msgstr ""
+
+#: src/Admin/AdminPage.php:456
+msgid "Bar deactivated."
+msgstr ""
+
+#: src/Admin/AdminPage.php:457
+msgid "Bar duplicated. The copy is not active yet."
+msgstr ""
+
+#: src/Admin/AdminPage.php:458
+msgid "Settings saved."
+msgstr ""
+
+#: src/Admin/AdminPage.php:459
+msgid "Import complete. Please choose custom graphics from other websites again."
+msgstr ""
+
+#: src/Admin/AdminPage.php:460
+msgid "Import failed. Please choose an export file of this plugin (.json, at most 1 MB)."
+msgstr ""
+
+#: src/Admin/AdminPage.php:462
+#, php-format
+msgid "You can create at most %d bars."
+msgstr ""
+
+#: src/Admin/AdminPage.php:463 src/Admin/AdminPage.php:694
+msgid "The bar was not found."
+msgstr ""
+
+#: src/Admin/AdminPage.php:481
+msgid "No bar yet"
+msgstr ""
+
+#: src/Admin/AdminPage.php:482
+msgid "A bar is a group of floating buttons on one edge of the screen, for example phone, email and directions on the right in the middle. You can create a separate bar for each edge."
+msgstr ""
+
+#: src/Admin/AdminPage.php:483
+msgid "Create your first bar"
+msgstr ""
+
+#: src/Admin/AdminPage.php:490
+msgid "Bar"
+msgstr ""
+
+#: src/Admin/AdminPage.php:490 src/Admin/AdminPage.php:737
+msgid "Buttons"
+msgstr ""
+
+#: src/Admin/AdminPage.php:490 src/Admin/AdminPage.php:954
+msgid "Position"
+msgstr ""
+
+#: src/Admin/AdminPage.php:490
+msgid "Devices"
+msgstr ""
+
+#: src/Admin/AdminPage.php:490
+msgid "Status"
+msgstr ""
+
+#: src/Admin/AdminPage.php:514 src/Admin/AdminPage.php:1079 src/Admin/AdminPage.php:1149
+msgid "Desktop"
+msgstr ""
+
+#: src/Admin/AdminPage.php:517 src/Admin/AdminPage.php:1080 src/Admin/AdminPage.php:1150
+msgid "Tablet"
+msgstr ""
+
+#: src/Admin/AdminPage.php:520 src/Admin/AdminPage.php:1081 src/Admin/AdminPage.php:1151
+msgid "Mobile"
+msgstr ""
+
+#: src/Admin/AdminPage.php:525
+msgid "Active"
+msgstr ""
+
+#: src/Admin/AdminPage.php:525
+msgid "Inactive"
+msgstr ""
+
+#: src/Admin/AdminPage.php:529
+msgid "Edit"
+msgstr ""
+
+#: src/Admin/AdminPage.php:530 src/Admin/AdminPage.php:769 src/Admin/AdminPage.php:769
+msgid "Duplicate"
+msgstr ""
+
+#: src/Admin/AdminPage.php:531
+msgid "Delete"
+msgstr ""
+
+#: src/Admin/AdminPage.php:531
+msgid "Really delete this bar?"
+msgstr ""
+
+#: src/Admin/AdminPage.php:574
+msgid "Clear the page cache automatically after saving"
+msgstr ""
+
+#: src/Admin/AdminPage.php:577
+#, php-format
+msgid "Detected: %s"
+msgstr ""
+
+#: src/Admin/AdminPage.php:578
+msgid "Supported: WP Rocket, LiteSpeed Cache, W3 Total Cache, WP Super Cache, SiteGround. None detected at the moment."
+msgstr ""
+
+#: src/Admin/AdminPage.php:580
+msgid "Remove all bars and settings when the plugin is deleted"
+msgstr ""
+
+#: src/Admin/AdminPage.php:589
+msgid "Save settings"
+msgstr ""
+
+#: src/Admin/AdminPage.php:593
+msgid "Export"
+msgstr ""
+
+#: src/Admin/AdminPage.php:594
+msgid "Back up all bars as a file or move them to another website."
+msgstr ""
+
+#: src/Admin/AdminPage.php:598
+msgid "Download export file"
+msgstr ""
+
+#: src/Admin/AdminPage.php:601 src/Admin/AdminPage.php:609
+msgid "Import"
+msgstr ""
+
+#: src/Admin/AdminPage.php:606
+msgid "Add to the existing bars"
+msgstr ""
+
+#: src/Admin/AdminPage.php:607
+msgid "Replace the existing bars"
+msgstr ""
+
+#: src/Admin/AdminPage.php:608
+msgid "Custom graphics from another website's media library are not imported. The chosen icon is shown instead."
+msgstr ""
+
+#: src/Admin/AdminPage.php:622
+msgid "Floating Buttons Pro"
+msgstr ""
+
+#: src/Admin/AdminPage.php:624
+msgid "Opening hours per button: show the phone or WhatsApp button only when someone can answer."
+msgstr ""
+
+#: src/Admin/AdminPage.php:625
+msgid "Display rules: show a bar only on chosen pages, post types or languages (WPML, Polylang)."
+msgstr ""
+
+#: src/Admin/AdminPage.php:626
+msgid "Click tracking: every click is sent as an event to Google Analytics 4 or Google Tag Manager."
+msgstr ""
+
+#: src/Admin/AdminPage.php:629
+msgid "Try Pro free for 30 days"
+msgstr ""
+
+#: src/Admin/AdminPage.php:631
+msgid "Upgrade to Pro"
+msgstr ""
+
+#: src/Admin/AdminPage.php:642 src/Admin/AdminPage.php:965
+msgid "Left"
+msgstr ""
+
+#: src/Admin/AdminPage.php:643 src/Admin/AdminPage.php:967
+msgid "Right"
+msgstr ""
+
+#: src/Admin/AdminPage.php:644 src/Admin/AdminPage.php:965
+msgid "Top"
+msgstr ""
+
+#: src/Admin/AdminPage.php:645 src/Admin/AdminPage.php:967
+msgid "Bottom"
+msgstr ""
+
+#: src/Admin/AdminPage.php:660
+msgid "Call us"
+msgstr ""
+
+#: src/Admin/AdminPage.php:661
+msgid "We are available Mon–Fri from 8 am to 5 pm."
+msgstr ""
+
+#: src/Admin/AdminPage.php:669 src/Admin/AdminPage.php:824
+msgid "Send an email"
+msgstr ""
+
+#: src/Admin/AdminPage.php:670
+msgid "We usually reply within one working day."
+msgstr ""
+
+#: src/Admin/AdminPage.php:678
+msgid "Directions"
+msgstr ""
+
+#: src/Admin/AdminPage.php:679
+msgid "Open the route in Google Maps"
+msgstr ""
+
+#: src/Admin/AdminPage.php:695
+msgid "Back to overview"
+msgstr ""
+
+#: src/Admin/AdminPage.php:700
+msgid "All bars"
+msgstr ""
+
+#: src/Admin/AdminPage.php:711 src/Admin/AdminPage.php:711
+msgid "Bar name"
+msgstr ""
+
+#: src/Admin/AdminPage.php:712
+msgid "Active on the website"
+msgstr ""
+
+#: src/Admin/AdminPage.php:738
+msgid "Drag the handle to change the order."
+msgstr ""
+
+#: src/Admin/AdminPage.php:744
+msgid "Add button"
+msgstr ""
+
+#: src/Admin/AdminPage.php:765
+msgid "Drag to sort"
+msgstr ""
+
+#: src/Admin/AdminPage.php:768 src/Admin/AdminPage.php:768
+msgid "Show"
+msgstr ""
+
+#: src/Admin/AdminPage.php:770 src/Admin/AdminPage.php:770 src/Admin/AdminPage.php:804
+msgid "Remove"
+msgstr ""
+
+#: src/Admin/AdminPage.php:777
+msgid "Graphic"
+msgstr ""
+
+#: src/Admin/AdminPage.php:780
+msgid "Font Awesome"
+msgstr ""
+
+#: src/Admin/AdminPage.php:781
+msgid "b83 icons"
+msgstr ""
+
+#: src/Admin/AdminPage.php:782
+msgid "Own image"
+msgstr ""
+
+#: src/Admin/AdminPage.php:789 src/Admin/AdminPage.php:1027
+msgid "Icon"
+msgstr ""
+
+#: src/Admin/AdminPage.php:794
+msgid "Font Awesome icon"
+msgstr ""
+
+#: src/Admin/AdminPage.php:797
+msgid "More than 2,100 icons (solid, regular, brands). Embedded as a small SVG, no Font Awesome font is loaded."
+msgstr ""
+
+#: src/Admin/AdminPage.php:800
+msgid "Custom graphic"
+msgstr ""
+
+#: src/Admin/AdminPage.php:803
+msgid "Choose from media library"
+msgstr ""
+
+#: src/Admin/AdminPage.php:805
+msgid "Ideally square, PNG or SVG with a transparent background."
+msgstr ""
+
+#: src/Admin/AdminPage.php:810
+msgid "Heading when expanded"
+msgstr ""
+
+#: src/Admin/AdminPage.php:810
+msgid "e.g. Call now"
+msgstr ""
+
+#: src/Admin/AdminPage.php:810
+msgid "Leave empty for an icon-only button."
+msgstr ""
+
+#: src/Admin/AdminPage.php:811
+msgid "Small text below"
+msgstr ""
+
+#: src/Admin/AdminPage.php:811
+msgid "e.g. +43 6243 1234"
+msgstr ""
+
+#: src/Admin/AdminPage.php:811
+msgid "Optional, shown in small type below the heading."
+msgstr ""
+
+#: src/Admin/AdminPage.php:814
+msgid "Info text on hover"
+msgstr ""
+
+#: src/Admin/AdminPage.php:814
+msgid "e.g. Available Mon–Fri 8 am–5 pm"
+msgstr ""
+
+#: src/Admin/AdminPage.php:814
+msgid "Shown as a tooltip next to the button."
+msgstr ""
+
+#: src/Admin/AdminPage.php:819
+msgid "Action on click"
+msgstr ""
+
+#: src/Admin/AdminPage.php:822
+msgid "Link (web page)"
+msgstr ""
+
+#: src/Admin/AdminPage.php:823
+msgid "Call a phone number"
+msgstr ""
+
+#: src/Admin/AdminPage.php:825
+msgid "WhatsApp chat"
+msgstr ""
+
+#: src/Admin/AdminPage.php:826
+msgid "Chat / messenger"
+msgstr ""
+
+#: src/Admin/AdminPage.php:827
+msgid "Send a text message"
+msgstr ""
+
+#: src/Admin/AdminPage.php:828
+msgid "Scroll to top"
+msgstr ""
+
+#: src/Admin/AdminPage.php:829
+msgid "None (info only)"
+msgstr ""
+
+#: src/Admin/AdminPage.php:837
+msgid "Address"
+msgstr ""
+
+#: src/Admin/AdminPage.php:837
+msgid "https://… or /contact/ or #directions"
+msgstr ""
+
+#: src/Admin/AdminPage.php:840
+msgid "Chat link"
+msgstr ""
+
+#: src/Admin/AdminPage.php:841
+msgid "Messenger, Telegram, Signal, Skype, Viber, Teams or the address of your chat system."
+msgstr ""
+
+#: src/Admin/AdminPage.php:844
+msgid "Phone number"
+msgstr ""
+
+#: src/Admin/AdminPage.php:847
+msgid "Email address"
+msgstr ""
+
+#: src/Admin/AdminPage.php:847
+msgid "office@example.com"
+msgstr ""
+
+#: src/Admin/AdminPage.php:850
+msgid "Subject (optional)"
+msgstr ""
+
+#: src/Admin/AdminPage.php:850
+msgid "Enquiry via the website"
+msgstr ""
+
+#: src/Admin/AdminPage.php:853
+msgid "WhatsApp number (international)"
+msgstr ""
+
+#: src/Admin/AdminPage.php:856
+msgid "Prefilled message (optional)"
+msgstr ""
+
+#: src/Admin/AdminPage.php:856
+msgid "Hello, I have a question …"
+msgstr ""
+
+#: src/Admin/AdminPage.php:861
+msgid "Open in a new window"
+msgstr ""
+
+#: src/Admin/AdminPage.php:862
+msgid "nofollow (search engines should not follow)"
+msgstr ""
+
+#: src/Admin/AdminPage.php:863
+msgid "Applies to external addresses only."
+msgstr ""
+
+#: src/Admin/AdminPage.php:877
+msgid "Own colours for this button"
+msgstr ""
+
+#: src/Admin/AdminPage.php:878
+msgid "Empty means the bar colours are used. Without a hover colour of its own, the button keeps its colour on hover, which suits a green WhatsApp button, for example."
+msgstr ""
+
+#: src/Admin/AdminPage.php:880 src/Admin/AdminPage.php:1026
+msgid "Background"
+msgstr ""
+
+#: src/Admin/AdminPage.php:881
+msgid "Icon & text"
+msgstr ""
+
+#: src/Admin/AdminPage.php:882
+msgid "Background (hover)"
+msgstr ""
+
+#: src/Admin/AdminPage.php:883
+msgid "Icon & text (hover)"
+msgstr ""
+
+#: src/Admin/AdminPage.php:914
+msgid "Search icons …"
+msgstr ""
+
+#: src/Admin/AdminPage.php:914 src/Admin/AdminPage.php:933
+msgid "Search icons"
+msgstr ""
+
+#: src/Admin/AdminPage.php:915 src/Admin/AdminPage.php:934
+msgid "Close"
+msgstr ""
+
+#: src/Admin/AdminPage.php:932
+msgid "Choose a Font Awesome icon"
+msgstr ""
+
+#: src/Admin/AdminPage.php:933
+msgid "Search, e.g. phone, bed, ski …"
+msgstr ""
+
+#: src/Admin/AdminPage.php:935
+msgid "Style"
+msgstr ""
+
+#: src/Admin/AdminPage.php:936
+msgid "All"
+msgstr ""
+
+#: src/Admin/AdminPage.php:938
+msgid "Solid"
+msgstr ""
+
+#: src/Admin/AdminPage.php:939
+msgid "Regular"
+msgstr ""
+
+#: src/Admin/AdminPage.php:940
+msgid "Brands"
+msgstr ""
+
+#: src/Admin/AdminPage.php:946
+msgid "Icons: Font Awesome Free (fontawesome.com), licence CC BY 4.0"
+msgstr ""
+
+#: src/Admin/AdminPage.php:956
+msgid "Screen edge"
+msgstr ""
+
+#: src/Admin/AdminPage.php:963
+msgid "Alignment along the edge"
+msgstr ""
+
+#: src/Admin/AdminPage.php:966 src/Admin/AdminPage.php:966
+msgid "Center"
+msgstr ""
+
+#: src/Admin/AdminPage.php:973
+msgid "Distance from start or end"
+msgstr ""
+
+#: src/Admin/AdminPage.php:973
+msgid "No effect when centred."
+msgstr ""
+
+#: src/Admin/AdminPage.php:977
+msgid "Distance from the edge"
+msgstr ""
+
+#: src/Admin/AdminPage.php:977
+msgid "0 = flush with the edge (square corners there)."
+msgstr ""
+
+#: src/Admin/AdminPage.php:978
+msgid "Space between buttons"
+msgstr ""
+
+#: src/Admin/AdminPage.php:979
+msgid "Hidden in the edge when collapsed"
+msgstr ""
+
+#: src/Admin/AdminPage.php:979
+msgid "Slides out fully on hover."
+msgstr ""
+
+#: src/Admin/AdminPage.php:989
+msgid "Appearance"
+msgstr ""
+
+#: src/Admin/AdminPage.php:992
+msgid "Button size"
+msgstr ""
+
+#: src/Admin/AdminPage.php:993
+msgid "Icon size"
+msgstr ""
+
+#: src/Admin/AdminPage.php:993
+msgid "Share of the button size."
+msgstr ""
+
+#: src/Admin/AdminPage.php:994
+msgid "Corner radius"
+msgstr ""
+
+#: src/Admin/AdminPage.php:994
+msgid "Half the button size = round."
+msgstr ""
+
+#: src/Admin/AdminPage.php:998
+msgid "Heading font size"
+msgstr ""
+
+#: src/Admin/AdminPage.php:999
+msgid "Small text font size"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1002
+msgid "Font weight"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1005 src/Admin/AdminPage.php:1024
+msgid "Normal"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1006
+msgid "Semibold"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1007
+msgid "Bold"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1012
+msgid "Shadow"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1015
+msgid "None"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1016
+msgid "Soft"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1017
+msgid "Strong"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1022
+msgid "Colours"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1024
+msgid "Hover"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1028
+msgid "Text"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1035
+msgid "Info text"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1036
+msgid "Info text background"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1037
+msgid "Info text colour"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1039
+msgid "Info text: background on the left, text colour on the right. Individual buttons can have their own colours."
+msgstr ""
+
+#: src/Admin/AdminPage.php:1048
+msgid "Behaviour"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1050
+msgid "Delay before expanding"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1050
+msgid "Prevents expanding when the mouse just passes by. Recommended: 100–250."
+msgstr ""
+
+#: src/Admin/AdminPage.php:1051
+msgid "Animation duration"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1054
+msgid "Appearance on page load"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1057
+msgid "Visible immediately"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1058
+msgid "Fade in"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1059
+msgid "Slide in"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1064
+msgid "Show info texts"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1065
+msgid "Layer (z-index)"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1065
+msgid "Only change this if other elements cover the buttons."
+msgstr ""
+
+#: src/Admin/AdminPage.php:1074
+msgid "Devices & pages"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1077
+msgid "Show on"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1085
+msgid "Tablet: 768–1024 px, mobile: up to 767 px (same as Elementor)."
+msgstr ""
+
+#: src/Admin/AdminPage.php:1091
+msgid "Display on mobile devices"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1094
+msgid "Like desktop: first tap expands, second tap opens"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1095
+msgid "Icons only: a tap opens the link right away"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1096
+msgid "Bar at the bottom (full width)"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1099
+msgid "Button size on mobile"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1111
+msgid "Do not show on these pages"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1135
+msgid "Show this bar only on chosen pages, post types or languages, and show buttons only during opening hours."
+msgstr ""
+
+#: src/Admin/AdminPage.php:1135
+msgid "Learn more"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1146
+msgid "Live preview"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1147
+msgid "Device"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1156
+msgid "Preview"
+msgstr ""
+
+#: src/Admin/AdminPage.php:1157
+msgid "Hover over the buttons to see them expand and show their info text. The preview also shows inactive bars."
+msgstr ""
+
+#: src/Admin/AdminPage.php:1161
+msgid "Save"
+msgstr ""
+
+#: src/Admin/AdminPage.php:508
+#, php-format
+msgid "%d active"
+msgid_plural "%d active"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Admin/B83Menu.php:62
+msgid "Overview"
+msgstr ""
+
+#: src/Admin/B83Menu.php:122
+msgid "b83 Plugins"
+msgstr ""
+
+#: src/Admin/B83Menu.php:123
+msgid "Developed and maintained by b83 – Strategisches Online Marketing."
+msgstr ""
+
+#: src/Admin/B83Menu.php:134
+msgid "active"
+msgstr ""
+
+#: src/Admin/B83Menu.php:134
+msgid "inactive"
+msgstr ""
+
+#: src/Admin/B83Menu.php:138
+#, php-format
+msgid "Version %s"
+msgstr ""
+
+#: src/Admin/B83Menu.php:141
+msgid "Open"
+msgstr ""
+
+#: src/Frontend/Renderer.php:271
+msgid "(opens in a new window)"
+msgstr ""
+
+#: b83-floating-buttons.php (header)
+msgid "b83 Floating Buttons"
+msgstr ""
+
+#: b83-floating-buttons.php (header)
+msgid "Floating buttons on the left, right, top or bottom edge of every page, with Font Awesome icons, own icons or images, expanding text on hover, info texts, links, email, phone, WhatsApp and chat. Fully customisable and responsive."
+msgstr ""
+
+#: b83-floating-buttons.php (Name der Pro-Version)
+msgid "b83 Floating Buttons Pro"
+msgstr ""

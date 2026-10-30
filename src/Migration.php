@@ -46,6 +46,21 @@ final class Migration {
 	}
 
 	/**
+	 * Aufräumen nach dem Löschen (über Freemius „after_uninstall“).
+	 * Daten werden nur entfernt, wenn das in den Einstellungen aktiviert ist.
+	 */
+	public static function uninstall(): void {
+		$settings = get_option( Repository::OPTION_SETTINGS, array() );
+		if ( ! is_array( $settings ) || empty( $settings['delete_on_uninstall'] ) ) {
+			return;
+		}
+		foreach ( array( Repository::OPTION_GROUPS, Repository::OPTION_SETTINGS, self::OPTION_DB_VERSION ) as $option ) {
+			delete_option( $option );
+		}
+		delete_transient( 'b83_floating_buttons_release' );
+	}
+
+	/**
 	 * Erkennt das Format einer importierten Datei und liefert die Leisten.
 	 *
 	 * @param array<mixed> $decoded JSON-Inhalt.

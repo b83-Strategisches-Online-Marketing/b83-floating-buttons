@@ -73,7 +73,7 @@ final class Sanitizer {
 		return array_merge(
 			array(
 				'id'            => '',
-				'name'          => __( 'Neue Leiste', 'b83-floating-buttons' ),
+				'name'          => __( 'New bar', 'b83-floating-buttons' ),
 				'active'        => true,
 				'position'      => 'right',
 				'align'         => 'center',
@@ -94,6 +94,10 @@ final class Sanitizer {
 				'show_mobile'   => true,
 				'mobile_layout' => 'same',
 				'exclude_ids'   => array(),
+				// Pro: Anzeigeregeln (werden auch in der Gratisversion gespeichert, aber nur in Pro ausgewertet).
+				'include_ids'   => array(),
+				'include_types' => array(),
+				'languages'     => array(),
 				'items'         => array(),
 			),
 			$numbers
@@ -129,6 +133,9 @@ final class Sanitizer {
 			'color'          => '',
 			'bg_hover'       => '',
 			'color_hover'    => '',
+			// Pro: Öffnungszeiten (1 = Montag … 7 = Sonntag).
+			'hours_enabled'  => false,
+			'hours'          => array_fill_keys( array( '1', '2', '3', '4', '5', '6', '7' ), '' ),
 		);
 	}
 
@@ -171,6 +178,9 @@ final class Sanitizer {
 		$g['show_mobile']   = self::bool( $raw['show_mobile'] ?? false );
 		$g['mobile_layout'] = self::choice( $raw['mobile_layout'] ?? '', self::MOBILE_LAYOUT, $d['mobile_layout'] );
 		$g['exclude_ids']   = self::id_list( $raw['exclude_ids'] ?? array() );
+		$g['include_ids']   = self::id_list( $raw['include_ids'] ?? array() );
+		$g['include_types'] = self::slug_list( $raw['include_types'] ?? array(), 20 );
+		$g['languages']     = self::slug_list( $raw['languages'] ?? array(), 10 );
 
 		$items = array();
 		foreach ( array_slice( (array) ( $raw['items'] ?? array() ), 0, self::MAX_ITEMS ) as $item ) {
@@ -231,6 +241,9 @@ final class Sanitizer {
 			$i[ $key ] = self::color( $raw[ $key ] ?? '' );
 		}
 
+		$i['hours_enabled'] = self::bool( $raw['hours_enabled'] ?? false );
+		$i['hours']         = self::hours( $raw['hours'] ?? array() );
+
 		return $i;
 	}
 
@@ -276,13 +289,49 @@ final class Sanitizer {
 	 * Allgemeine Einstellungen.
 	 *
 	 * @param array<mixed> $raw Rohdaten.
-	 * @return array{delete_on_uninstall:bool,purge_cache:bool}
+	 * @return array{delete_on_uninstall:bool,purge_cache:bool,tracking:bool,tracking_event:string}
 	 */
 	public static function settings( array $raw ): array {
+		$event = strtolower( self::text( $raw['tracking_event'] ?? '', 40 ) );
+		$event = (string) preg_replace( '/[^a-z0-9_]/', '_', $event );
 		return array(
 			'delete_on_uninstall' => self::bool( $raw['delete_on_uninstall'] ?? false ),
 			'purge_cache'         => self::bool( $raw['purge_cache'] ?? true ),
+			// Pro: Klick-Tracking.
+			'tracking'            => self::bool( $raw['tracking'] ?? false ),
+			'tracking_event'      => 1 === preg_match( '/^[a-z][a-z0-9_]*$/', $event ) ? $event : 'floating_button_click',
 		);
+	}
+
+	/**
+	 * Pro-Felder aus einer gespeicherten Leiste übernehmen, wenn das Formular
+	 * sie nicht enthält (Gratisversion). So gehen sie beim Speichern nicht verloren.
+	 *
+	 * @param array<string,mixed>      $group Neue, bereinigte Leiste.
+	 * @param array<string,mixed>|null $old   Bisher gespeicherte Leiste.
+	 * @return array<string,mixed>
+	 */
+	public static function keep_pro_fields( array $group, ?array $old ): array {
+		if ( null === $old ) {
+			return $group;
+		}
+		foreach ( array( 'include_ids', 'include_types', 'languages' ) as $key ) {
+			$group[ $key ] = $old[ $key ] ?? array();
+		}
+		$old_items = array();
+		foreach ( (array) ( $old['items'] ?? array() ) as $item ) {
+			if ( is_array( $item ) && ! empty( $item['id'] ) ) {
+				$old_items[ (string) $item['id'] ] = $item;
+			}
+		}
+		foreach ( $group['items'] as $index => $item ) {
+			$previous = $old_items[ (string) $item['id'] ] ?? null;
+			if ( null !== $previous ) {
+				$group['items'][ $index ]['hours_enabled'] = (bool) ( $previous['hours_enabled'] ?? false );
+				$group['items'][ $index ]['hours']         = self::hours( $previous['hours'] ?? array() );
+			}
+		}
+		return $group;
 	}
 
 	/* ---------------------------------------------------------------------
@@ -401,6 +450,50 @@ final class Sanitizer {
 			return '+' . substr( $value, 2 );
 		}
 		return '' !== $value ? $plus . $value : '';
+	}
+
+	/**
+	 * Öffnungszeiten je Wochentag (1 = Montag … 7 = Sonntag) im Format
+	 * „08:00-12:00,13:00-17:00“. Leer = geschlossen. Höchstens drei Zeiträume je Tag.
+	 *
+	 * @param mixed $value Rohwert.
+	 * @return array<string,string>
+	 */
+	public static function hours( $value ): array {
+		$value = is_array( $value ) ? $value : array();
+		$clean = array();
+		foreach ( array( '1', '2', '3', '4', '5', '6', '7' ) as $day ) {
+			$text   = self::text( $value[ $day ] ?? ( $value[ (int) $day ] ?? '' ), 100 );
+			$ranges = array();
+			if ( preg_match_all( '/(\d{1,2})(?:[:.](\d{2}))?\s*[-–]\s*(\d{1,2})(?:[:.](\d{2}))?/u', $text, $matches, PREG_SET_ORDER ) ) {
+				foreach ( $matches as $m ) {
+					$start = (int) $m[1] * 60 + (int) ( '' !== ( $m[2] ?? '' ) ? $m[2] : 0 );
+					$end   = (int) $m[3] * 60 + (int) ( '' !== ( $m[4] ?? '' ) ? $m[4] : 0 );
+					if ( $start < $end && $end <= 1440 && (int) ( $m[2] ?? 0 ) < 60 && (int) ( $m[4] ?? 0 ) < 60 ) {
+						$ranges[] = sprintf( '%02d:%02d-%02d:%02d', intdiv( $start, 60 ), $start % 60, intdiv( $end, 60 ), $end % 60 );
+					}
+				}
+			}
+			$clean[ $day ] = implode( ',', array_slice( $ranges, 0, 3 ) );
+		}
+		return $clean;
+	}
+
+	/**
+	 * Liste kurzer Kennungen (Post Types, Sprachcodes).
+	 *
+	 * @param mixed $value Rohwert.
+	 * @return string[]
+	 */
+	public static function slug_list( $value, int $max_length ): array {
+		$list = array();
+		foreach ( (array) $value as $entry ) {
+			$key = substr( sanitize_key( is_scalar( $entry ) ? (string) $entry : '' ), 0, $max_length );
+			if ( '' !== $key ) {
+				$list[] = $key;
+			}
+		}
+		return array_slice( array_values( array_unique( $list ) ), 0, 50 );
 	}
 
 	/**

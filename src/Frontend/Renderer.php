@@ -224,7 +224,31 @@ final class Renderer {
 		} elseif ( '' !== $sub ) {
 			$classes .= ' b83-fb__item--has-sub';
 		}
-		$html = '<li class="' . $classes . '" data-b83-fb-item="' . esc_attr( $id ) . '">';
+		/**
+		 * Filtert die Attribute des Listeneintrags eines Buttons (z. B. für Pro-Funktionen).
+		 * Schlüssel „class“ als Zeichenkette, alle Werte werden escaped ausgegeben.
+		 *
+		 * @param array<string,string> $li_attrs Attribute.
+		 * @param array<string,mixed>  $item     Button.
+		 * @param array<string,mixed>  $group    Leiste.
+		 */
+		$li_attrs = (array) apply_filters(
+			'b83_floating_buttons_item_attributes',
+			array(
+				'class'           => $classes,
+				'data-b83-fb-item' => $id,
+			),
+			$item,
+			$group
+		);
+		$html     = '<li';
+		foreach ( $li_attrs as $attr => $value ) {
+			$attr = strtolower( (string) $attr );
+			if ( 1 === preg_match( '/^[a-z][a-z0-9-]*$/', $attr ) && ! str_starts_with( $attr, 'on' ) && is_scalar( $value ) ) {
+				$html .= ' ' . $attr . '="' . esc_attr( (string) $value ) . '"';
+			}
+		}
+		$html .= '>';
 
 		$html .= '<' . $tag;
 		foreach ( $attrs as $attr => $value ) {
@@ -244,7 +268,7 @@ final class Renderer {
 			$html .= '<span class="b83-fb__sr">' . esc_html( $name ) . '</span>';
 		}
 		if ( null !== $link && $link['blank'] ) {
-			$html .= '<span class="b83-fb__sr">' . esc_html__( '(öffnet in neuem Fenster)', 'b83-floating-buttons' ) . '</span>';
+			$html .= '<span class="b83-fb__sr">' . esc_html__( '(opens in a new window)', 'b83-floating-buttons' ) . '</span>';
 		}
 		if ( '' !== $tooltip ) {
 			$html .= '<span class="b83-fb__tip" role="tooltip" id="b83-fb-tip-' . esc_attr( $id ) . '">' . esc_html( $tooltip ) . '</span>';

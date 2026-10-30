@@ -59,7 +59,7 @@ final class B83Menu {
 			$this->icon(),
 			81
 		);
-		add_submenu_page( self::SLUG, 'b83 Plugins', __( 'Übersicht', 'b83-floating-buttons' ), 'manage_options', self::SLUG, array( $this, 'render_overview' ) );
+		add_submenu_page( self::SLUG, 'b83 Plugins', __( 'Overview', 'b83-floating-buttons' ), 'manage_options', self::SLUG, array( $this, 'render_overview' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 	}
 
@@ -103,7 +103,7 @@ final class B83Menu {
 
 	public function render_overview(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Keine Berechtigung.', 'b83-floating-buttons' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to do this.', 'b83-floating-buttons' ), '', array( 'response' => 403 ) );
 		}
 
 		/**
@@ -120,7 +120,7 @@ final class B83Menu {
 
 		echo '<div class="b83-overview__head"><img src="' . esc_url( $logo ) . '" alt="b83"><div>';
 		echo '<h1>' . esc_html__( 'b83 Plugins', 'b83-floating-buttons' ) . '</h1>';
-		echo '<p>' . esc_html__( 'Entwickelt und betreut von b83 – Strategisches Online Marketing.', 'b83-floating-buttons' ) . '</p>';
+		echo '<p>' . esc_html__( 'Developed and maintained by b83 – Strategisches Online Marketing.', 'b83-floating-buttons' ) . '</p>';
 		echo '</div></div>';
 
 		echo '<div class="b83-overview__grid">';
@@ -131,14 +131,14 @@ final class B83Menu {
 			printf(
 				'<span class="b83-overview__status %1$s">%2$s</span>',
 				$active ? 'is-on' : 'is-off',
-				$active ? esc_html__( 'aktiv', 'b83-floating-buttons' ) : esc_html__( 'inaktiv', 'b83-floating-buttons' )
+				$active ? esc_html__( 'active', 'b83-floating-buttons' ) : esc_html__( 'inactive', 'b83-floating-buttons' )
 			);
 			echo '</h2>';
-			/* translators: %s: Versionsnummer */
+			/* translators: %s: version number */
 			echo '<p class="b83-overview__meta">' . esc_html( sprintf( __( 'Version %s', 'b83-floating-buttons' ), (string) $data['Version'] ) ) . '</p>';
 			echo '<p>' . esc_html( wp_strip_all_tags( (string) $data['Description'] ) ) . '</p>';
 			if ( $active && ! empty( $links[ $file ] ) ) {
-				echo '<p><a class="button button-primary" href="' . esc_url( (string) $links[ $file ] ) . '">' . esc_html__( 'Öffnen', 'b83-floating-buttons' ) . '</a></p>';
+				echo '<p><a class="button button-primary" href="' . esc_url( (string) $links[ $file ] ) . '">' . esc_html__( 'Open', 'b83-floating-buttons' ) . '</a></p>';
 			}
 			echo '</div>';
 		}

@@ -82,7 +82,7 @@ final class AdminPage {
 	 * @return string[]
 	 */
 	public function action_links( array $links ): array {
-		array_unshift( $links, '<a href="' . esc_url( self::url() ) . '">' . esc_html__( 'Einstellungen', 'b83-floating-buttons' ) . '</a>' );
+		array_unshift( $links, '<a href="' . esc_url( self::url() ) . '">' . esc_html__( 'Settings', 'b83-floating-buttons' ) . '</a>' );
 		return $links;
 	}
 
@@ -126,33 +126,33 @@ final class AdminPage {
 				'nonce'   => wp_create_nonce( 'b83_fb_preview' ),
 				'faUrl'   => B83_FB_URL . FontAwesome::data_path() . '?ver=' . rawurlencode( B83_FB_VERSION ),
 				'i18n'    => array(
-					'mediaTitle'  => __( 'Grafik für den Button wählen', 'b83-floating-buttons' ),
-					'mediaButton' => __( 'Grafik verwenden', 'b83-floating-buttons' ),
-					'confirmDel'  => __( 'Diesen Button entfernen?', 'b83-floating-buttons' ),
-					'noLabel'     => __( '(ohne Text)', 'b83-floating-buttons' ),
+					'mediaTitle'  => __( 'Choose a graphic for the button', 'b83-floating-buttons' ),
+					'mediaButton' => __( 'Use graphic', 'b83-floating-buttons' ),
+					'confirmDel'  => __( 'Remove this button?', 'b83-floating-buttons' ),
+					'noLabel'     => __( '(no text)', 'b83-floating-buttons' ),
 					'maxItems'    => sprintf(
-						/* translators: %d: Höchstzahl */
-						__( 'Höchstens %d Buttons je Leiste.', 'b83-floating-buttons' ),
+						/* translators: %d: maximum number */
+						__( 'At most %d buttons per bar.', 'b83-floating-buttons' ),
 						Sanitizer::MAX_ITEMS
 					),
-					'previewErr'  => __( 'Vorschau konnte nicht geladen werden.', 'b83-floating-buttons' ),
-					'faLoading'   => __( 'Icons werden geladen …', 'b83-floating-buttons' ),
-					'faError'     => __( 'Die Icon-Liste konnte nicht geladen werden.', 'b83-floating-buttons' ),
-					'faNone'      => __( 'Kein Icon gefunden – auf Englisch suchen, z. B. „phone“, „bed“, „ski“.', 'b83-floating-buttons' ),
-					/* translators: 1: angezeigte Icons, 2: Treffer gesamt */
-					'faMore'      => __( '%1$d von %2$d Treffern – Suche verfeinern, um mehr zu sehen.', 'b83-floating-buttons' ),
-					'faChoose'    => __( 'Icon wählen', 'b83-floating-buttons' ),
+					'previewErr'  => __( 'The preview could not be loaded.', 'b83-floating-buttons' ),
+					'faLoading'   => __( 'Loading icons …', 'b83-floating-buttons' ),
+					'faError'     => __( 'The icon list could not be loaded.', 'b83-floating-buttons' ),
+					'faNone'      => __( 'No icon found. Search in English, e.g. "phone", "bed", "ski".', 'b83-floating-buttons' ),
+					/* translators: 1: icons shown, 2: total results */
+					'faMore'      => __( '%1$d of %2$d results. Refine your search to see more.', 'b83-floating-buttons' ),
+					'faChoose'    => __( 'Choose icon', 'b83-floating-buttons' ),
 				),
 				'maxItems' => Sanitizer::MAX_ITEMS,
 				'linkTypes' => array(
 					'url'      => __( 'Link', 'b83-floating-buttons' ),
-					'phone'    => __( 'Telefon', 'b83-floating-buttons' ),
-					'email'    => __( 'E-Mail', 'b83-floating-buttons' ),
+					'phone'    => __( 'Phone', 'b83-floating-buttons' ),
+					'email'    => __( 'Email', 'b83-floating-buttons' ),
 					'whatsapp' => __( 'WhatsApp', 'b83-floating-buttons' ),
 					'chat'     => __( 'Chat', 'b83-floating-buttons' ),
 					'sms'      => __( 'SMS', 'b83-floating-buttons' ),
-					'top'      => __( 'Nach oben', 'b83-floating-buttons' ),
-					'none'     => __( 'Nur Info', 'b83-floating-buttons' ),
+					'top'      => __( 'Back to top', 'b83-floating-buttons' ),
+					'none'     => __( 'Info only', 'b83-floating-buttons' ),
 				),
 			)
 		);
@@ -164,7 +164,7 @@ final class AdminPage {
 
 	private function guard( string $nonce_action ): void {
 		if ( ! current_user_can( self::capability() ) ) {
-			wp_die( esc_html__( 'Keine Berechtigung.', 'b83-floating-buttons' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to do this.', 'b83-floating-buttons' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( $nonce_action );
 	}
@@ -182,8 +182,14 @@ final class AdminPage {
 	 */
 	private function posted_group(): array {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce in guard()/ajax_preview(), Validierung in Sanitizer::group().
-		$raw = isset( $_POST['group'] ) && is_array( $_POST['group'] ) ? wp_unslash( $_POST['group'] ) : array();
-		return Sanitizer::group( (array) $raw, $this->icons );
+		$raw   = isset( $_POST['group'] ) && is_array( $_POST['group'] ) ? wp_unslash( $_POST['group'] ) : array();
+		$group = Sanitizer::group( (array) $raw, $this->icons );
+
+		// Ohne Pro-Felder im Formular (Gratisversion) die gespeicherten Pro-Werte behalten.
+		if ( empty( $raw['_pro'] ) ) {
+			$group = Sanitizer::keep_pro_fields( $group, $this->repository->group( (string) $group['id'] ) );
+		}
+		return $group;
 	}
 
 	public function handle_save(): void {
@@ -225,8 +231,8 @@ final class AdminPage {
 			self::redirect( 'not_found' );
 		}
 		$group = $this->fresh_ids( $group );
-		/* translators: %s: Name der Leiste */
-		$group['name']   = mb_substr( sprintf( __( '%s (Kopie)', 'b83-floating-buttons' ), $group['name'] ), 0, 80 );
+		/* translators: %s: bar name */
+		$group['name']   = mb_substr( sprintf( __( '%s (copy)', 'b83-floating-buttons' ), $group['name'] ), 0, 80 );
 		$group['active'] = false;
 		if ( ! $this->repository->save_group( Sanitizer::group( $group, $this->icons ) ) ) {
 			self::redirect( 'limit' );
@@ -238,7 +244,15 @@ final class AdminPage {
 		$this->guard( 'b83_fb_settings' );
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce in guard(), Validierung in Sanitizer::settings().
 		$raw = isset( $_POST['settings'] ) && is_array( $_POST['settings'] ) ? wp_unslash( $_POST['settings'] ) : array();
-		$this->repository->save_settings( Sanitizer::settings( (array) $raw ) );
+		$raw = (array) $raw;
+
+		// Ohne Pro-Felder im Formular (Gratisversion) die gespeicherten Tracking-Werte behalten.
+		if ( empty( $raw['_pro'] ) ) {
+			$current               = $this->repository->settings();
+			$raw['tracking']       = $current['tracking'];
+			$raw['tracking_event'] = $current['tracking_event'];
+		}
+		$this->repository->save_settings( Sanitizer::settings( $raw ) );
 		self::redirect( 'settings', array( 'tab' => 'settings' ) );
 	}
 
@@ -367,7 +381,7 @@ final class AdminPage {
 		$html = $this->renderer->group_html( $group );
 		$bar  = 'bar' === $group['mobile_layout'] && $group['show_mobile'] ? ' b83-fb-has-bar' : '';
 
-		$doc  = '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">';
+		$doc  = '<!doctype html><html lang="' . esc_attr( get_bloginfo( 'language' ) ) . '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">';
 		$doc .= '<link rel="stylesheet" href="' . esc_url( B83_FB_URL . 'assets/css/preview-page.css?ver=' . B83_FB_VERSION ) . '">';
 		$doc .= '<link rel="stylesheet" href="' . esc_url( B83_FB_URL . 'assets/css/frontend.css?ver=' . B83_FB_VERSION ) . '">';
 		$doc .= '<style>' . $css . '</style></head><body class="b83-fb-preview-page' . esc_attr( $bar ) . '">';
@@ -387,7 +401,7 @@ final class AdminPage {
 
 	public function render(): void {
 		if ( ! current_user_can( self::capability() ) ) {
-			wp_die( esc_html__( 'Keine Berechtigung.', 'b83-floating-buttons' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You are not allowed to do this.', 'b83-floating-buttons' ), '', array( 'response' => 403 ) );
 		}
 
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- nur Ansicht.
@@ -406,14 +420,15 @@ final class AdminPage {
 
 		echo '<h1 class="wp-heading-inline">' . esc_html__( 'Floating Buttons', 'b83-floating-buttons' ) . '</h1>';
 		if ( 'groups' === $tab && count( $this->repository->groups() ) < Sanitizer::MAX_GROUPS ) {
-			echo ' <a class="page-title-action" href="' . esc_url( self::url( array( 'edit' => 'new' ) ) ) . '">' . esc_html__( 'Neue Leiste', 'b83-floating-buttons' ) . '</a>';
+			echo ' <a class="page-title-action" href="' . esc_url( self::url( array( 'edit' => 'new' ) ) ) . '">' . esc_html__( 'New bar', 'b83-floating-buttons' ) . '</a>';
 		}
 		echo '<hr class="wp-header-end">';
 		$this->notices();
 
 		echo '<nav class="nav-tab-wrapper">';
-		printf( '<a class="nav-tab %1$s" href="%2$s">%3$s</a>', 'groups' === $tab ? 'nav-tab-active' : '', esc_url( self::url() ), esc_html__( 'Leisten', 'b83-floating-buttons' ) );
-		printf( '<a class="nav-tab %1$s" href="%2$s">%3$s</a>', 'settings' === $tab ? 'nav-tab-active' : '', esc_url( self::url( array( 'tab' => 'settings' ) ) ), esc_html__( 'Einstellungen & Export', 'b83-floating-buttons' ) );
+		printf( '<a class="nav-tab %1$s" href="%2$s">%3$s</a>', 'groups' === $tab ? 'nav-tab-active' : '', esc_url( self::url() ), esc_html__( 'Bars', 'b83-floating-buttons' ) );
+		printf( '<a class="nav-tab %1$s" href="%2$s">%3$s</a>', 'settings' === $tab ? 'nav-tab-active' : '', esc_url( self::url( array( 'tab' => 'settings' ) ) ), esc_html__( 'Settings & export', 'b83-floating-buttons' ) );
+		printf( '<a class="nav-tab" href="%1$s">%2$s</a>', esc_url( b83fb_fs()->get_account_url() ), esc_html__( 'Account & license', 'b83-floating-buttons' ) );
 		echo '</nav>';
 
 		if ( 'settings' === $tab ) {
@@ -433,19 +448,19 @@ final class AdminPage {
 		$cache   = CachePurge::detected_plugin();
 		$notices = array(
 			'saved'        => array( 'success', '' !== $cache && $this->repository->settings()['purge_cache']
-				/* translators: %s: Name des Cache-Plugins */
-				? sprintf( __( 'Leiste gespeichert. Der Cache von %s wurde geleert.', 'b83-floating-buttons' ), $cache )
-				: __( 'Leiste gespeichert.', 'b83-floating-buttons' ) ),
-			'deleted'      => array( 'success', __( 'Leiste gelöscht.', 'b83-floating-buttons' ) ),
-			'activated'    => array( 'success', __( 'Leiste aktiviert.', 'b83-floating-buttons' ) ),
-			'deactivated'  => array( 'success', __( 'Leiste deaktiviert.', 'b83-floating-buttons' ) ),
-			'duplicated'   => array( 'success', __( 'Leiste dupliziert. Die Kopie ist noch deaktiviert.', 'b83-floating-buttons' ) ),
-			'settings'     => array( 'success', __( 'Einstellungen gespeichert.', 'b83-floating-buttons' ) ),
-			'imported'     => array( 'success', __( 'Import abgeschlossen. Eigene Grafiken aus anderen Websites bitte neu auswählen.', 'b83-floating-buttons' ) ),
-			'import_error' => array( 'error', __( 'Import fehlgeschlagen: Bitte eine Exportdatei dieses Plugins (.json, höchstens 1 MB) wählen.', 'b83-floating-buttons' ) ),
-			/* translators: %d: Höchstzahl */
-			'limit'        => array( 'error', sprintf( __( 'Es sind höchstens %d Leisten möglich.', 'b83-floating-buttons' ), Sanitizer::MAX_GROUPS ) ),
-			'not_found'    => array( 'error', __( 'Die Leiste wurde nicht gefunden.', 'b83-floating-buttons' ) ),
+				/* translators: %s: cache plugin name */
+				? sprintf( __( 'Bar saved. The %s cache was cleared.', 'b83-floating-buttons' ), $cache )
+				: __( 'Bar saved.', 'b83-floating-buttons' ) ),
+			'deleted'      => array( 'success', __( 'Bar deleted.', 'b83-floating-buttons' ) ),
+			'activated'    => array( 'success', __( 'Bar activated.', 'b83-floating-buttons' ) ),
+			'deactivated'  => array( 'success', __( 'Bar deactivated.', 'b83-floating-buttons' ) ),
+			'duplicated'   => array( 'success', __( 'Bar duplicated. The copy is not active yet.', 'b83-floating-buttons' ) ),
+			'settings'     => array( 'success', __( 'Settings saved.', 'b83-floating-buttons' ) ),
+			'imported'     => array( 'success', __( 'Import complete. Please choose custom graphics from other websites again.', 'b83-floating-buttons' ) ),
+			'import_error' => array( 'error', __( 'Import failed. Please choose an export file of this plugin (.json, at most 1 MB).', 'b83-floating-buttons' ) ),
+			/* translators: %d: maximum number */
+			'limit'        => array( 'error', sprintf( __( 'You can create at most %d bars.', 'b83-floating-buttons' ), Sanitizer::MAX_GROUPS ) ),
+			'not_found'    => array( 'error', __( 'The bar was not found.', 'b83-floating-buttons' ) ),
 		);
 		if ( ! isset( $notices[ $key ] ) ) {
 			return;
@@ -463,16 +478,16 @@ final class AdminPage {
 
 		if ( array() === $groups ) {
 			echo '<div class="b83-fb-empty">';
-			echo '<h2>' . esc_html__( 'Noch keine Leiste angelegt', 'b83-floating-buttons' ) . '</h2>';
-			echo '<p>' . esc_html__( 'Eine Leiste ist eine Gruppe schwebender Buttons an einem Bildschirmrand – zum Beispiel Telefon, E-Mail und Anfahrt rechts in der Mitte. Pro Rand können Sie eine eigene Leiste anlegen.', 'b83-floating-buttons' ) . '</p>';
-			echo '<p><a class="button button-primary button-hero" href="' . esc_url( self::url( array( 'edit' => 'new' ) ) ) . '">' . esc_html__( 'Erste Leiste anlegen', 'b83-floating-buttons' ) . '</a></p>';
+			echo '<h2>' . esc_html__( 'No bar yet', 'b83-floating-buttons' ) . '</h2>';
+			echo '<p>' . esc_html__( 'A bar is a group of floating buttons on one edge of the screen, for example phone, email and directions on the right in the middle. You can create a separate bar for each edge.', 'b83-floating-buttons' ) . '</p>';
+			echo '<p><a class="button button-primary button-hero" href="' . esc_url( self::url( array( 'edit' => 'new' ) ) ) . '">' . esc_html__( 'Create your first bar', 'b83-floating-buttons' ) . '</a></p>';
 			echo '</div>';
 			return;
 		}
 
 		$positions = $this->position_labels();
 		echo '<table class="widefat striped b83-fb-table"><thead><tr>';
-		foreach ( array( __( 'Leiste', 'b83-floating-buttons' ), __( 'Buttons', 'b83-floating-buttons' ), __( 'Position', 'b83-floating-buttons' ), __( 'Geräte', 'b83-floating-buttons' ), __( 'Status', 'b83-floating-buttons' ), '' ) as $head ) {
+		foreach ( array( __( 'Bar', 'b83-floating-buttons' ), __( 'Buttons', 'b83-floating-buttons' ), __( 'Position', 'b83-floating-buttons' ), __( 'Devices', 'b83-floating-buttons' ), __( 'Status', 'b83-floating-buttons' ), '' ) as $head ) {
 			echo '<th>' . esc_html( $head ) . '</th>';
 		}
 		echo '</tr></thead><tbody>';
@@ -489,8 +504,8 @@ final class AdminPage {
 				echo '<span class="b83-fb-mini__icon">' . $this->item_thumb( $item ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- item_thumb() escaped.
 			}
 			echo '</span> ';
-			/* translators: %d: Anzahl */
-			echo '<span class="description">' . esc_html( sprintf( _n( '%d aktiv', '%d aktiv', count( $active ), 'b83-floating-buttons' ), count( $active ) ) ) . '</span></td>';
+			/* translators: %d: number */
+			echo '<span class="description">' . esc_html( sprintf( _n( '%d active', '%d active', count( $active ), 'b83-floating-buttons' ), count( $active ) ) ) . '</span></td>';
 
 			echo '<td>' . esc_html( $positions[ $group['position'] ] ?? '' ) . '</td>';
 
@@ -502,18 +517,18 @@ final class AdminPage {
 				$devices[] = __( 'Tablet', 'b83-floating-buttons' );
 			}
 			if ( $group['show_mobile'] ) {
-				$devices[] = __( 'Mobil', 'b83-floating-buttons' );
+				$devices[] = __( 'Mobile', 'b83-floating-buttons' );
 			}
 			echo '<td>' . esc_html( implode( ', ', $devices ) ) . '</td>';
 
 			echo '<td>';
-			$this->action_button( 'toggle', (string) $group['id'], $group['active'] ? __( 'Aktiv', 'b83-floating-buttons' ) : __( 'Inaktiv', 'b83-floating-buttons' ), 'b83-fb-status ' . ( $group['active'] ? 'is-on' : 'is-off' ) );
+			$this->action_button( 'toggle', (string) $group['id'], $group['active'] ? __( 'Active', 'b83-floating-buttons' ) : __( 'Inactive', 'b83-floating-buttons' ), 'b83-fb-status ' . ( $group['active'] ? 'is-on' : 'is-off' ) );
 			echo '</td>';
 
 			echo '<td class="b83-fb-table__actions">';
-			echo '<a class="button button-small" href="' . esc_url( $edit_url ) . '">' . esc_html__( 'Bearbeiten', 'b83-floating-buttons' ) . '</a> ';
-			$this->action_button( 'duplicate', (string) $group['id'], __( 'Duplizieren', 'b83-floating-buttons' ), 'button button-small' );
-			$this->action_button( 'delete', (string) $group['id'], __( 'Löschen', 'b83-floating-buttons' ), 'button button-small button-link-delete', __( 'Diese Leiste wirklich löschen?', 'b83-floating-buttons' ) );
+			echo '<a class="button button-small" href="' . esc_url( $edit_url ) . '">' . esc_html__( 'Edit', 'b83-floating-buttons' ) . '</a> ';
+			$this->action_button( 'duplicate', (string) $group['id'], __( 'Duplicate', 'b83-floating-buttons' ), 'button button-small' );
+			$this->action_button( 'delete', (string) $group['id'], __( 'Delete', 'b83-floating-buttons' ), 'button button-small button-link-delete', __( 'Really delete this bar?', 'b83-floating-buttons' ) );
 			echo '</td></tr>';
 		}
 		echo '</tbody></table>';
@@ -553,26 +568,34 @@ final class AdminPage {
 		echo '<div class="b83-fb-cards">';
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="b83-fb-card">';
-		echo '<h2>' . esc_html__( 'Allgemein', 'b83-floating-buttons' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'General', 'b83-floating-buttons' ) . '</h2>';
 		echo '<input type="hidden" name="action" value="b83_fb_settings">';
 		wp_nonce_field( 'b83_fb_settings' );
-		echo '<p><label><input type="checkbox" name="settings[purge_cache]" value="1"' . checked( $settings['purge_cache'], true, false ) . '> ' . esc_html__( 'Seiten-Cache nach dem Speichern automatisch leeren', 'b83-floating-buttons' ) . '</label><br><span class="description">';
+		echo '<p><label><input type="checkbox" name="settings[purge_cache]" value="1"' . checked( $settings['purge_cache'], true, false ) . '> ' . esc_html__( 'Clear the page cache automatically after saving', 'b83-floating-buttons' ) . '</label><br><span class="description">';
 		echo '' !== $cache
-			/* translators: %s: Name des Cache-Plugins */
-			? esc_html( sprintf( __( 'Erkannt: %s', 'b83-floating-buttons' ), $cache ) )
-			: esc_html__( 'Unterstützt: WP Rocket, LiteSpeed Cache, W3 Total Cache, WP Super Cache, SiteGround. Derzeit keines erkannt.', 'b83-floating-buttons' );
+			/* translators: %s: cache plugin name */
+			? esc_html( sprintf( __( 'Detected: %s', 'b83-floating-buttons' ), $cache ) )
+			: esc_html__( 'Supported: WP Rocket, LiteSpeed Cache, W3 Total Cache, WP Super Cache, SiteGround. None detected at the moment.', 'b83-floating-buttons' );
 		echo '</span></p>';
-		echo '<p><label><input type="checkbox" name="settings[delete_on_uninstall]" value="1"' . checked( $settings['delete_on_uninstall'], true, false ) . '> ' . esc_html__( 'Beim Löschen des Plugins alle Leisten und Einstellungen entfernen', 'b83-floating-buttons' ) . '</label></p>';
-		submit_button( __( 'Einstellungen speichern', 'b83-floating-buttons' ) );
+		echo '<p><label><input type="checkbox" name="settings[delete_on_uninstall]" value="1"' . checked( $settings['delete_on_uninstall'], true, false ) . '> ' . esc_html__( 'Remove all bars and settings when the plugin is deleted', 'b83-floating-buttons' ) . '</label></p>';
+
+		/**
+		 * Weitere Felder im Formular „Allgemein“ (Pro: Klick-Tracking).
+		 *
+		 * @param array<string,mixed> $settings Einstellungen.
+		 */
+		do_action( 'b83_floating_buttons_admin_settings_fields', $settings );
+
+		submit_button( __( 'Save settings', 'b83-floating-buttons' ) );
 		echo '</form>';
 
 		echo '<div class="b83-fb-card">';
 		echo '<h2>' . esc_html__( 'Export', 'b83-floating-buttons' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Alle Leisten als Datei sichern oder auf eine andere Website übertragen.', 'b83-floating-buttons' ) . '</p>';
+		echo '<p>' . esc_html__( 'Back up all bars as a file or move them to another website.', 'b83-floating-buttons' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="b83_fb_export">';
 		wp_nonce_field( 'b83_fb_export' );
-		submit_button( __( 'Exportdatei herunterladen', 'b83-floating-buttons' ), 'secondary', 'submit', false );
+		submit_button( __( 'Download export file', 'b83-floating-buttons' ), 'secondary', 'submit', false );
 		echo '</form>';
 
 		echo '<h2>' . esc_html__( 'Import', 'b83-floating-buttons' ) . '</h2>';
@@ -580,13 +603,33 @@ final class AdminPage {
 		echo '<input type="hidden" name="action" value="b83_fb_import">';
 		wp_nonce_field( 'b83_fb_import' );
 		echo '<p><input type="file" name="import_file" accept=".json,application/json" required></p>';
-		echo '<p><label><input type="radio" name="import_mode" value="add" checked> ' . esc_html__( 'Zu den bestehenden Leisten hinzufügen', 'b83-floating-buttons' ) . '</label><br>';
-		echo '<label><input type="radio" name="import_mode" value="replace"> ' . esc_html__( 'Bestehende Leisten ersetzen', 'b83-floating-buttons' ) . '</label></p>';
-		echo '<p class="description">' . esc_html__( 'Eigene Grafiken aus der Mediathek einer anderen Website werden nicht übernommen – dort wird wieder das gewählte Icon angezeigt.', 'b83-floating-buttons' ) . '</p>';
-		submit_button( __( 'Importieren', 'b83-floating-buttons' ), 'secondary', 'submit', false );
+		echo '<p><label><input type="radio" name="import_mode" value="add" checked> ' . esc_html__( 'Add to the existing bars', 'b83-floating-buttons' ) . '</label><br>';
+		echo '<label><input type="radio" name="import_mode" value="replace"> ' . esc_html__( 'Replace the existing bars', 'b83-floating-buttons' ) . '</label></p>';
+		echo '<p class="description">' . esc_html__( 'Custom graphics from another website\'s media library are not imported. The chosen icon is shown instead.', 'b83-floating-buttons' ) . '</p>';
+		submit_button( __( 'Import', 'b83-floating-buttons' ), 'secondary', 'submit', false );
 		echo '</form></div>';
 
 		echo '</div>';
+		$this->pro_box();
+	}
+
+	/** Hinweis auf Pro, solange keine gültige Lizenz oder Testphase läuft. */
+	private function pro_box(): void {
+		if ( b83fb_fs()->can_use_premium_code() ) {
+			return;
+		}
+		echo '<div class="b83-fb-card b83-fb-pro-box">';
+		echo '<h2>' . esc_html__( 'Floating Buttons Pro', 'b83-floating-buttons' ) . '</h2>';
+		echo '<ul>';
+		echo '<li>' . esc_html__( 'Opening hours per button: show the phone or WhatsApp button only when someone can answer.', 'b83-floating-buttons' ) . '</li>';
+		echo '<li>' . esc_html__( 'Display rules: show a bar only on chosen pages, post types or languages (WPML, Polylang).', 'b83-floating-buttons' ) . '</li>';
+		echo '<li>' . esc_html__( 'Click tracking: every click is sent as an event to Google Analytics 4 or Google Tag Manager.', 'b83-floating-buttons' ) . '</li>';
+		echo '</ul><p>';
+		if ( ! b83fb_fs()->is_trial_utilized() ) {
+			printf( '<a class="button button-primary" href="%1$s">%2$s</a> ', esc_url( b83fb_fs()->get_trial_url() ), esc_html__( 'Try Pro free for 30 days', 'b83-floating-buttons' ) );
+		}
+		printf( '<a class="button" href="%1$s">%2$s</a>', esc_url( b83fb_fs()->get_upgrade_url() ), esc_html__( 'Upgrade to Pro', 'b83-floating-buttons' ) );
+		echo '</p></div>';
 	}
 
 	/* ---------------------------------------------------------------------
@@ -596,10 +639,10 @@ final class AdminPage {
 	/** @return array<string,string> */
 	private function position_labels(): array {
 		return array(
-			'left'   => __( 'Links', 'b83-floating-buttons' ),
-			'right'  => __( 'Rechts', 'b83-floating-buttons' ),
-			'top'    => __( 'Oben', 'b83-floating-buttons' ),
-			'bottom' => __( 'Unten', 'b83-floating-buttons' ),
+			'left'   => __( 'Left', 'b83-floating-buttons' ),
+			'right'  => __( 'Right', 'b83-floating-buttons' ),
+			'top'    => __( 'Top', 'b83-floating-buttons' ),
+			'bottom' => __( 'Bottom', 'b83-floating-buttons' ),
 		);
 	}
 
@@ -614,8 +657,8 @@ final class AdminPage {
 			array_merge(
 				Sanitizer::item_defaults(),
 				array(
-					'label'     => __( 'Anrufen', 'b83-floating-buttons' ),
-					'tooltip'   => __( 'Wir sind Mo–Fr von 8 bis 17 Uhr für Sie da.', 'b83-floating-buttons' ),
+					'label'     => __( 'Call us', 'b83-floating-buttons' ),
+					'tooltip'   => __( 'We are available Mon–Fri from 8 am to 5 pm.', 'b83-floating-buttons' ),
 					'icon'      => 'phone',
 					'link_type' => 'phone',
 				)
@@ -623,8 +666,8 @@ final class AdminPage {
 			array_merge(
 				Sanitizer::item_defaults(),
 				array(
-					'label'     => __( 'E-Mail schreiben', 'b83-floating-buttons' ),
-					'tooltip'   => __( 'Wir antworten in der Regel innerhalb eines Werktags.', 'b83-floating-buttons' ),
+					'label'     => __( 'Send an email', 'b83-floating-buttons' ),
+					'tooltip'   => __( 'We usually reply within one working day.', 'b83-floating-buttons' ),
 					'icon'      => 'mail',
 					'link_type' => 'email',
 				)
@@ -632,8 +675,8 @@ final class AdminPage {
 			array_merge(
 				Sanitizer::item_defaults(),
 				array(
-					'label'     => __( 'Anfahrt', 'b83-floating-buttons' ),
-					'tooltip'   => __( 'Route in Google Maps öffnen', 'b83-floating-buttons' ),
+					'label'     => __( 'Directions', 'b83-floating-buttons' ),
+					'tooltip'   => __( 'Open the route in Google Maps', 'b83-floating-buttons' ),
 					'icon'      => 'map-pin',
 					'link_type' => 'url',
 				)
@@ -648,13 +691,13 @@ final class AdminPage {
 		} else {
 			$group = $this->repository->group( $edit );
 			if ( null === $group ) {
-				echo '<div class="notice notice-error inline"><p>' . esc_html__( 'Die Leiste wurde nicht gefunden.', 'b83-floating-buttons' ) . '</p></div>';
-				echo '<p><a href="' . esc_url( self::url() ) . '">&larr; ' . esc_html__( 'Zur Übersicht', 'b83-floating-buttons' ) . '</a></p>';
+				echo '<div class="notice notice-error inline"><p>' . esc_html__( 'The bar was not found.', 'b83-floating-buttons' ) . '</p></div>';
+				echo '<p><a href="' . esc_url( self::url() ) . '">&larr; ' . esc_html__( 'Back to overview', 'b83-floating-buttons' ) . '</a></p>';
 				return;
 			}
 		}
 
-		echo '<p class="b83-fb-back"><a href="' . esc_url( self::url() ) . '">&larr; ' . esc_html__( 'Alle Leisten', 'b83-floating-buttons' ) . '</a></p>';
+		echo '<p class="b83-fb-back"><a href="' . esc_url( self::url() ) . '">&larr; ' . esc_html__( 'All bars', 'b83-floating-buttons' ) . '</a></p>';
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" id="b83-fb-form" class="b83-fb-editor">';
 		echo '<input type="hidden" name="action" value="b83_fb_save">';
@@ -665,8 +708,8 @@ final class AdminPage {
 
 		// Kopf: Name und Status.
 		echo '<div class="b83-fb-titlebar">';
-		echo '<input type="text" class="b83-fb-title" name="group[name]" maxlength="80" value="' . esc_attr( (string) $group['name'] ) . '" aria-label="' . esc_attr__( 'Name der Leiste', 'b83-floating-buttons' ) . '" placeholder="' . esc_attr__( 'Name der Leiste', 'b83-floating-buttons' ) . '">';
-		echo '<label class="b83-fb-switch"><input type="checkbox" name="group[active]" value="1"' . checked( $group['active'], true, false ) . '><span class="b83-fb-switch__track"></span><span>' . esc_html__( 'Aktiv auf der Website', 'b83-floating-buttons' ) . '</span></label>';
+		echo '<input type="text" class="b83-fb-title" name="group[name]" maxlength="80" value="' . esc_attr( (string) $group['name'] ) . '" aria-label="' . esc_attr__( 'Bar name', 'b83-floating-buttons' ) . '" placeholder="' . esc_attr__( 'Bar name', 'b83-floating-buttons' ) . '">';
+		echo '<label class="b83-fb-switch"><input type="checkbox" name="group[active]" value="1"' . checked( $group['active'], true, false ) . '><span class="b83-fb-switch__track"></span><span>' . esc_html__( 'Active on the website', 'b83-floating-buttons' ) . '</span></label>';
 		echo '</div>';
 
 		$this->render_items_box( $group );
@@ -692,13 +735,13 @@ final class AdminPage {
 	private function render_items_box( array $group ): void {
 		echo '<section class="b83-fb-card">';
 		echo '<div class="b83-fb-card__head"><h2>' . esc_html__( 'Buttons', 'b83-floating-buttons' ) . '</h2>';
-		echo '<span class="description">' . esc_html__( 'Reihenfolge per Ziehen am Griff ändern.', 'b83-floating-buttons' ) . '</span></div>';
+		echo '<span class="description">' . esc_html__( 'Drag the handle to change the order.', 'b83-floating-buttons' ) . '</span></div>';
 		echo '<div class="b83-fb-items" id="b83-fb-items">';
 		foreach ( array_values( (array) $group['items'] ) as $index => $item ) {
 			$this->render_item( $item, (string) $index, false );
 		}
 		echo '</div>';
-		echo '<p><button type="button" class="button button-secondary" id="b83-fb-add"><span class="dashicons dashicons-plus-alt2"></span> ' . esc_html__( 'Button hinzufügen', 'b83-floating-buttons' ) . '</button></p>';
+		echo '<p><button type="button" class="button button-secondary" id="b83-fb-add"><span class="dashicons dashicons-plus-alt2"></span> ' . esc_html__( 'Add button', 'b83-floating-buttons' ) . '</button></p>';
 		echo '</section>';
 	}
 
@@ -719,24 +762,24 @@ final class AdminPage {
 
 		// Kopfzeile.
 		echo '<div class="b83-fb-item__head">';
-		echo '<span class="b83-fb-item__handle dashicons dashicons-move" title="' . esc_attr__( 'Ziehen zum Sortieren', 'b83-floating-buttons' ) . '"></span>';
+		echo '<span class="b83-fb-item__handle dashicons dashicons-move" title="' . esc_attr__( 'Drag to sort', 'b83-floating-buttons' ) . '"></span>';
 		echo '<span class="b83-fb-item__thumb" data-role="thumb">' . $this->item_thumb( $item ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- item_thumb() escaped.
-		echo '<button type="button" class="b83-fb-item__toggle" aria-expanded="' . ( $open ? 'true' : 'false' ) . '"><span class="b83-fb-item__title" data-role="title">' . esc_html( '' !== $item['label'] ? (string) $item['label'] : __( '(ohne Text)', 'b83-floating-buttons' ) ) . '</span><span class="b83-fb-item__meta" data-role="meta"></span><span class="dashicons dashicons-arrow-down-alt2"></span></button>';
-		echo '<label class="b83-fb-switch b83-fb-switch--small" title="' . esc_attr__( 'Anzeigen', 'b83-floating-buttons' ) . '"><input type="checkbox" data-role="active" name="' . esc_attr( $n . '[active]' ) . '" value="1"' . checked( $item['active'], true, false ) . '><span class="b83-fb-switch__track"></span><span class="screen-reader-text">' . esc_html__( 'Anzeigen', 'b83-floating-buttons' ) . '</span></label>';
-		echo '<button type="button" class="b83-fb-icon-btn" data-role="duplicate" title="' . esc_attr__( 'Duplizieren', 'b83-floating-buttons' ) . '"><span class="dashicons dashicons-admin-page"></span><span class="screen-reader-text">' . esc_html__( 'Duplizieren', 'b83-floating-buttons' ) . '</span></button>';
-		echo '<button type="button" class="b83-fb-icon-btn is-danger" data-role="remove" title="' . esc_attr__( 'Entfernen', 'b83-floating-buttons' ) . '"><span class="dashicons dashicons-trash"></span><span class="screen-reader-text">' . esc_html__( 'Entfernen', 'b83-floating-buttons' ) . '</span></button>';
+		echo '<button type="button" class="b83-fb-item__toggle" aria-expanded="' . ( $open ? 'true' : 'false' ) . '"><span class="b83-fb-item__title" data-role="title">' . esc_html( '' !== $item['label'] ? (string) $item['label'] : __( '(no text)', 'b83-floating-buttons' ) ) . '</span><span class="b83-fb-item__meta" data-role="meta"></span><span class="dashicons dashicons-arrow-down-alt2"></span></button>';
+		echo '<label class="b83-fb-switch b83-fb-switch--small" title="' . esc_attr__( 'Show', 'b83-floating-buttons' ) . '"><input type="checkbox" data-role="active" name="' . esc_attr( $n . '[active]' ) . '" value="1"' . checked( $item['active'], true, false ) . '><span class="b83-fb-switch__track"></span><span class="screen-reader-text">' . esc_html__( 'Show', 'b83-floating-buttons' ) . '</span></label>';
+		echo '<button type="button" class="b83-fb-icon-btn" data-role="duplicate" title="' . esc_attr__( 'Duplicate', 'b83-floating-buttons' ) . '"><span class="dashicons dashicons-admin-page"></span><span class="screen-reader-text">' . esc_html__( 'Duplicate', 'b83-floating-buttons' ) . '</span></button>';
+		echo '<button type="button" class="b83-fb-icon-btn is-danger" data-role="remove" title="' . esc_attr__( 'Remove', 'b83-floating-buttons' ) . '"><span class="dashicons dashicons-trash"></span><span class="screen-reader-text">' . esc_html__( 'Remove', 'b83-floating-buttons' ) . '</span></button>';
 		echo '</div>';
 
 		echo '<div class="b83-fb-item__body">';
 
 		// Grafik.
 		echo '<div class="b83-fb-row">';
-		echo '<div class="b83-fb-field b83-fb-field--auto"><span class="b83-fb-label">' . esc_html__( 'Grafik', 'b83-floating-buttons' ) . '</span>';
+		echo '<div class="b83-fb-field b83-fb-field--auto"><span class="b83-fb-label">' . esc_html__( 'Graphic', 'b83-floating-buttons' ) . '</span>';
 		echo '<span class="b83-fb-seg">';
 		$icon_types = array(
 			'fa'    => __( 'Font Awesome', 'b83-floating-buttons' ),
-			'icon'  => __( 'b83-Icons', 'b83-floating-buttons' ),
-			'image' => __( 'Eigenes Bild', 'b83-floating-buttons' ),
+			'icon'  => __( 'b83 icons', 'b83-floating-buttons' ),
+			'image' => __( 'Own image', 'b83-floating-buttons' ),
 		);
 		foreach ( $icon_types as $value => $label ) {
 			echo '<label><input type="radio" data-role="icon-type" name="' . esc_attr( $n . '[icon_type]' ) . '" value="' . esc_attr( $value ) . '"' . checked( $item['icon_type'], $value, false ) . '><span>' . esc_html( $label ) . '</span></label>';
@@ -748,42 +791,42 @@ final class AdminPage {
 		echo '<button type="button" class="button b83-fb-pick" data-role="pick-icon"><span class="b83-fb-pick__svg" data-role="icon-preview">' . $this->icons->svg( (string) $item['icon'] ) . '</span><span data-role="icon-name">' . esc_html( (string) ( $this->icons->all()[ (string) $item['icon'] ]['label'] ?? '' ) ) . '</span></button></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Icons::svg() gefiltert.
 
 		$fa_svg = '' !== (string) $item['fa_path'] ? FontAwesome::svg( (int) $item['fa_width'], (string) $item['fa_path'] ) : '';
-		echo '<div class="b83-fb-field b83-fb-when-fa"><span class="b83-fb-label">' . esc_html__( 'Font-Awesome-Icon', 'b83-floating-buttons' ) . '</span>';
+		echo '<div class="b83-fb-field b83-fb-when-fa"><span class="b83-fb-label">' . esc_html__( 'Font Awesome icon', 'b83-floating-buttons' ) . '</span>';
 		echo '<input type="hidden" data-role="fa" name="' . esc_attr( $n . '[fa]' ) . '" value="' . esc_attr( (string) $item['fa'] ) . '">';
-		echo '<button type="button" class="button b83-fb-pick" data-role="pick-fa"><span class="b83-fb-pick__svg" data-role="fa-preview">' . $fa_svg . '</span><span data-role="fa-name">' . esc_html( '' !== (string) $item['fa_label'] ? (string) $item['fa_label'] : __( 'Icon wählen', 'b83-floating-buttons' ) ) . '</span></button>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- FontAwesome::svg() prüft den Pfad und escaped.
-		echo '<span class="description">' . esc_html__( 'Über 2.100 Icons (Solid, Regular, Marken). Wird als kleines SVG eingebettet – es wird keine Font-Awesome-Schrift geladen.', 'b83-floating-buttons' ) . '</span></div>';
+		echo '<button type="button" class="button b83-fb-pick" data-role="pick-fa"><span class="b83-fb-pick__svg" data-role="fa-preview">' . $fa_svg . '</span><span data-role="fa-name">' . esc_html( '' !== (string) $item['fa_label'] ? (string) $item['fa_label'] : __( 'Choose icon', 'b83-floating-buttons' ) ) . '</span></button>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- FontAwesome::svg() prüft den Pfad und escaped.
+		echo '<span class="description">' . esc_html__( 'More than 2,100 icons (solid, regular, brands). Embedded as a small SVG, no Font Awesome font is loaded.', 'b83-floating-buttons' ) . '</span></div>';
 
 		$img_url = $item['image_id'] ? (string) wp_get_attachment_image_url( (int) $item['image_id'], 'thumbnail' ) : '';
-		echo '<div class="b83-fb-field b83-fb-when-image"><span class="b83-fb-label">' . esc_html__( 'Eigene Grafik', 'b83-floating-buttons' ) . '</span>';
+		echo '<div class="b83-fb-field b83-fb-when-image"><span class="b83-fb-label">' . esc_html__( 'Custom graphic', 'b83-floating-buttons' ) . '</span>';
 		echo '<input type="hidden" data-role="image-id" name="' . esc_attr( $n . '[image_id]' ) . '" value="' . esc_attr( (string) (int) $item['image_id'] ) . '">';
 		echo '<span class="b83-fb-media"><span class="b83-fb-media__img" data-role="image-preview">' . ( '' !== $img_url ? '<img src="' . esc_url( $img_url ) . '" alt="">' : '' ) . '</span>';
-		echo '<button type="button" class="button" data-role="pick-image">' . esc_html__( 'Aus Mediathek wählen', 'b83-floating-buttons' ) . '</button> ';
-		echo '<button type="button" class="button-link button-link-delete" data-role="clear-image">' . esc_html__( 'Entfernen', 'b83-floating-buttons' ) . '</button></span>';
-		echo '<span class="description">' . esc_html__( 'Am besten quadratisch, PNG oder SVG mit transparentem Hintergrund.', 'b83-floating-buttons' ) . '</span></div>';
+		echo '<button type="button" class="button" data-role="pick-image">' . esc_html__( 'Choose from media library', 'b83-floating-buttons' ) . '</button> ';
+		echo '<button type="button" class="button-link button-link-delete" data-role="clear-image">' . esc_html__( 'Remove', 'b83-floating-buttons' ) . '</button></span>';
+		echo '<span class="description">' . esc_html__( 'Ideally square, PNG or SVG with a transparent background.', 'b83-floating-buttons' ) . '</span></div>';
 		echo '</div>';
 
 		// Texte.
 		echo '<div class="b83-fb-row">';
-		$this->text_field( $uid . '-label', $n . '[label]', __( 'Überschrift beim Ausklappen', 'b83-floating-buttons' ), (string) $item['label'], 60, __( 'z. B. Jetzt anrufen', 'b83-floating-buttons' ), __( 'Leer lassen für einen reinen Icon-Button.', 'b83-floating-buttons' ), 'label' );
-		$this->text_field( $uid . '-sub', $n . '[sublabel]', __( 'Zusatztext darunter (klein)', 'b83-floating-buttons' ), (string) $item['sublabel'], 100, __( 'z. B. +43 6243 1234', 'b83-floating-buttons' ), __( 'Optional, erscheint in kleiner Schrift unter der Überschrift.', 'b83-floating-buttons' ) );
+		$this->text_field( $uid . '-label', $n . '[label]', __( 'Heading when expanded', 'b83-floating-buttons' ), (string) $item['label'], 60, __( 'e.g. Call now', 'b83-floating-buttons' ), __( 'Leave empty for an icon-only button.', 'b83-floating-buttons' ), 'label' );
+		$this->text_field( $uid . '-sub', $n . '[sublabel]', __( 'Small text below', 'b83-floating-buttons' ), (string) $item['sublabel'], 100, __( 'e.g. +43 6243 1234', 'b83-floating-buttons' ), __( 'Optional, shown in small type below the heading.', 'b83-floating-buttons' ) );
 		echo '</div>';
 		echo '<div class="b83-fb-row">';
-		$this->text_field( $uid . '-tip', $n . '[tooltip]', __( 'Info-Text beim Drüberfahren', 'b83-floating-buttons' ), (string) $item['tooltip'], 200, __( 'z. B. Mo–Fr 8–17 Uhr erreichbar', 'b83-floating-buttons' ), __( 'Erscheint als Hinweisblase neben dem Button.', 'b83-floating-buttons' ) );
+		$this->text_field( $uid . '-tip', $n . '[tooltip]', __( 'Info text on hover', 'b83-floating-buttons' ), (string) $item['tooltip'], 200, __( 'e.g. Available Mon–Fri 8 am–5 pm', 'b83-floating-buttons' ), __( 'Shown as a tooltip next to the button.', 'b83-floating-buttons' ) );
 		echo '</div>';
 
 		// Link.
 		echo '<div class="b83-fb-row">';
-		echo '<div class="b83-fb-field"><label class="b83-fb-label" for="' . esc_attr( $uid . '-lt' ) . '">' . esc_html__( 'Aktion beim Klick', 'b83-floating-buttons' ) . '</label>';
+		echo '<div class="b83-fb-field"><label class="b83-fb-label" for="' . esc_attr( $uid . '-lt' ) . '">' . esc_html__( 'Action on click', 'b83-floating-buttons' ) . '</label>';
 		echo '<select id="' . esc_attr( $uid . '-lt' ) . '" data-role="link-type" name="' . esc_attr( $n . '[link_type]' ) . '">';
 		$types = array(
-			'url'      => __( 'Link (Webseite)', 'b83-floating-buttons' ),
-			'phone'    => __( 'Telefon anrufen', 'b83-floating-buttons' ),
-			'email'    => __( 'E-Mail schreiben', 'b83-floating-buttons' ),
-			'whatsapp' => __( 'WhatsApp-Chat', 'b83-floating-buttons' ),
-			'chat'     => __( 'Chat / Messenger', 'b83-floating-buttons' ),
-			'sms'      => __( 'SMS senden', 'b83-floating-buttons' ),
-			'top'      => __( 'Nach oben scrollen', 'b83-floating-buttons' ),
-			'none'     => __( 'Keine (nur Info)', 'b83-floating-buttons' ),
+			'url'      => __( 'Link (web page)', 'b83-floating-buttons' ),
+			'phone'    => __( 'Call a phone number', 'b83-floating-buttons' ),
+			'email'    => __( 'Send an email', 'b83-floating-buttons' ),
+			'whatsapp' => __( 'WhatsApp chat', 'b83-floating-buttons' ),
+			'chat'     => __( 'Chat / messenger', 'b83-floating-buttons' ),
+			'sms'      => __( 'Send a text message', 'b83-floating-buttons' ),
+			'top'      => __( 'Scroll to top', 'b83-floating-buttons' ),
+			'none'     => __( 'None (info only)', 'b83-floating-buttons' ),
 		);
 		foreach ( $types as $value => $label ) {
 			echo '<option value="' . esc_attr( $value ) . '"' . selected( $link, $value, false ) . '>' . esc_html( $label ) . '</option>';
@@ -791,44 +834,53 @@ final class AdminPage {
 		echo '</select></div>';
 
 		echo '<div class="b83-fb-field b83-fb-when b83-fb-when-url">';
-		$this->text_input( $uid . '-url', $n . '[url]', __( 'Adresse', 'b83-floating-buttons' ), (string) $item['url'], 2000, 'https://… oder /kontakt/ oder #anfahrt', 'text' );
+		$this->text_input( $uid . '-url', $n . '[url]', __( 'Address', 'b83-floating-buttons' ), (string) $item['url'], 2000, __( 'https://… or /contact/ or #directions', 'b83-floating-buttons' ), 'text' );
 		echo '</div>';
 		echo '<div class="b83-fb-field b83-fb-when b83-fb-when-chat">';
-		$this->text_input( $uid . '-chat', $n . '[chat_url]', __( 'Chat-Link', 'b83-floating-buttons' ), (string) $item['chat_url'], 2000, 'https://m.me/… · https://t.me/… · skype:name?chat', 'text' );
-		echo '<span class="description">' . esc_html__( 'Messenger, Telegram, Signal, Skype, Viber, Teams oder die Adresse eures Chat-Systems.', 'b83-floating-buttons' ) . '</span>';
+		$this->text_input( $uid . '-chat', $n . '[chat_url]', __( 'Chat link', 'b83-floating-buttons' ), (string) $item['chat_url'], 2000, 'https://m.me/… · https://t.me/… · skype:name?chat', 'text' );
+		echo '<span class="description">' . esc_html__( 'Messenger, Telegram, Signal, Skype, Viber, Teams or the address of your chat system.', 'b83-floating-buttons' ) . '</span>';
 		echo '</div>';
 		echo '<div class="b83-fb-field b83-fb-when b83-fb-when-phone b83-fb-when-sms">';
-		$this->text_input( $uid . '-phone', $n . '[phone]', __( 'Telefonnummer', 'b83-floating-buttons' ), (string) $item['phone'], 40, '+43 6243 1234', 'tel' );
+		$this->text_input( $uid . '-phone', $n . '[phone]', __( 'Phone number', 'b83-floating-buttons' ), (string) $item['phone'], 40, '+43 6243 1234', 'tel' );
 		echo '</div>';
 		echo '<div class="b83-fb-field b83-fb-when b83-fb-when-email">';
-		$this->text_input( $uid . '-mail', $n . '[email]', __( 'E-Mail-Adresse', 'b83-floating-buttons' ), (string) $item['email'], 254, 'office@beispiel.at', 'email' );
+		$this->text_input( $uid . '-mail', $n . '[email]', __( 'Email address', 'b83-floating-buttons' ), (string) $item['email'], 254, __( 'office@example.com', 'b83-floating-buttons' ), 'email' );
 		echo '</div>';
 		echo '<div class="b83-fb-field b83-fb-when b83-fb-when-email">';
-		$this->text_input( $uid . '-subj', $n . '[email_subject]', __( 'Betreff (optional)', 'b83-floating-buttons' ), (string) $item['email_subject'], 150, __( 'Anfrage über die Website', 'b83-floating-buttons' ), 'text' );
+		$this->text_input( $uid . '-subj', $n . '[email_subject]', __( 'Subject (optional)', 'b83-floating-buttons' ), (string) $item['email_subject'], 150, __( 'Enquiry via the website', 'b83-floating-buttons' ), 'text' );
 		echo '</div>';
 		echo '<div class="b83-fb-field b83-fb-when b83-fb-when-whatsapp">';
-		$this->text_input( $uid . '-wa', $n . '[whatsapp]', __( 'WhatsApp-Nummer (international)', 'b83-floating-buttons' ), (string) $item['whatsapp'], 30, '436641234567', 'tel' );
+		$this->text_input( $uid . '-wa', $n . '[whatsapp]', __( 'WhatsApp number (international)', 'b83-floating-buttons' ), (string) $item['whatsapp'], 30, '436641234567', 'tel' );
 		echo '</div>';
 		echo '<div class="b83-fb-field b83-fb-when b83-fb-when-whatsapp">';
-		$this->text_input( $uid . '-wat', $n . '[whatsapp_text]', __( 'Vorausgefüllte Nachricht (optional)', 'b83-floating-buttons' ), (string) $item['whatsapp_text'], 300, __( 'Hallo, ich habe eine Frage …', 'b83-floating-buttons' ), 'text' );
+		$this->text_input( $uid . '-wat', $n . '[whatsapp_text]', __( 'Prefilled message (optional)', 'b83-floating-buttons' ), (string) $item['whatsapp_text'], 300, __( 'Hello, I have a question …', 'b83-floating-buttons' ), 'text' );
 		echo '</div>';
 		echo '</div>';
 
 		echo '<div class="b83-fb-row b83-fb-when b83-fb-when-url b83-fb-when-whatsapp b83-fb-when-chat">';
-		echo '<label class="b83-fb-check"><input type="checkbox" name="' . esc_attr( $n . '[target_blank]' ) . '" value="1"' . checked( $item['target_blank'], true, false ) . '> ' . esc_html__( 'In neuem Fenster öffnen', 'b83-floating-buttons' ) . '</label>';
-		echo '<label class="b83-fb-check"><input type="checkbox" name="' . esc_attr( $n . '[nofollow]' ) . '" value="1"' . checked( $item['nofollow'], true, false ) . '> ' . esc_html__( 'nofollow (für Suchmaschinen nicht folgen)', 'b83-floating-buttons' ) . '</label>';
-		echo '<span class="description">' . esc_html__( 'Gilt nur für externe Adressen.', 'b83-floating-buttons' ) . '</span>';
+		echo '<label class="b83-fb-check"><input type="checkbox" name="' . esc_attr( $n . '[target_blank]' ) . '" value="1"' . checked( $item['target_blank'], true, false ) . '> ' . esc_html__( 'Open in a new window', 'b83-floating-buttons' ) . '</label>';
+		echo '<label class="b83-fb-check"><input type="checkbox" name="' . esc_attr( $n . '[nofollow]' ) . '" value="1"' . checked( $item['nofollow'], true, false ) . '> ' . esc_html__( 'nofollow (search engines should not follow)', 'b83-floating-buttons' ) . '</label>';
+		echo '<span class="description">' . esc_html__( 'Applies to external addresses only.', 'b83-floating-buttons' ) . '</span>';
 		echo '</div>';
+
+		/**
+		 * Weitere Felder eines Buttons (Pro: Öffnungszeiten).
+		 *
+		 * @param array<string,mixed> $item Button.
+		 * @param string              $n    Präfix der Feldnamen (group[items][…]).
+		 * @param string              $uid  Eindeutiger Präfix für Feld-IDs.
+		 */
+		do_action( 'b83_floating_buttons_admin_item_fields', $item, $n, $uid );
 
 		// Eigene Farben.
 		$has_colors = '' !== $item['bg'] . $item['color'] . $item['bg_hover'] . $item['color_hover'];
-		echo '<details class="b83-fb-details"' . ( $has_colors ? ' open' : '' ) . '><summary>' . esc_html__( 'Eigene Farben für diesen Button', 'b83-floating-buttons' ) . '</summary>';
-		echo '<p class="description">' . esc_html__( 'Leer = Farben der Leiste. Ohne eigene Hover-Farbe bleibt der Button beim Drüberfahren in seiner Farbe – praktisch z. B. für einen grünen WhatsApp-Button.', 'b83-floating-buttons' ) . '</p>';
+		echo '<details class="b83-fb-details"' . ( $has_colors ? ' open' : '' ) . '><summary>' . esc_html__( 'Own colours for this button', 'b83-floating-buttons' ) . '</summary>';
+		echo '<p class="description">' . esc_html__( 'Empty means the bar colours are used. Without a hover colour of its own, the button keeps its colour on hover, which suits a green WhatsApp button, for example.', 'b83-floating-buttons' ) . '</p>';
 		echo '<div class="b83-fb-colors">';
-		$this->color_field( $n . '[bg]', __( 'Hintergrund', 'b83-floating-buttons' ), (string) $item['bg'] );
-		$this->color_field( $n . '[color]', __( 'Icon & Text', 'b83-floating-buttons' ), (string) $item['color'] );
-		$this->color_field( $n . '[bg_hover]', __( 'Hintergrund (Hover)', 'b83-floating-buttons' ), (string) $item['bg_hover'] );
-		$this->color_field( $n . '[color_hover]', __( 'Icon & Text (Hover)', 'b83-floating-buttons' ), (string) $item['color_hover'] );
+		$this->color_field( $n . '[bg]', __( 'Background', 'b83-floating-buttons' ), (string) $item['bg'] );
+		$this->color_field( $n . '[color]', __( 'Icon & text', 'b83-floating-buttons' ), (string) $item['color'] );
+		$this->color_field( $n . '[bg_hover]', __( 'Background (hover)', 'b83-floating-buttons' ), (string) $item['bg_hover'] );
+		$this->color_field( $n . '[color_hover]', __( 'Icon & text (hover)', 'b83-floating-buttons' ), (string) $item['color_hover'] );
 		echo '</div></details>';
 
 		echo '</div></div>';
@@ -858,9 +910,9 @@ final class AdminPage {
 			$grouped[ $icon['group'] ][ $key ] = $icon;
 		}
 
-		echo '<div class="b83-fb-picker" id="b83-fb-picker" hidden role="dialog" aria-label="' . esc_attr__( 'Icon wählen', 'b83-floating-buttons' ) . '">';
-		echo '<div class="b83-fb-picker__head"><input type="search" class="b83-fb-picker__search" placeholder="' . esc_attr__( 'Icon suchen …', 'b83-floating-buttons' ) . '" aria-label="' . esc_attr__( 'Icon suchen', 'b83-floating-buttons' ) . '">';
-		echo '<button type="button" class="b83-fb-icon-btn" data-role="picker-close"><span class="dashicons dashicons-no-alt"></span><span class="screen-reader-text">' . esc_html__( 'Schließen', 'b83-floating-buttons' ) . '</span></button></div>';
+		echo '<div class="b83-fb-picker" id="b83-fb-picker" hidden role="dialog" aria-label="' . esc_attr__( 'Choose icon', 'b83-floating-buttons' ) . '">';
+		echo '<div class="b83-fb-picker__head"><input type="search" class="b83-fb-picker__search" placeholder="' . esc_attr__( 'Search icons …', 'b83-floating-buttons' ) . '" aria-label="' . esc_attr__( 'Search icons', 'b83-floating-buttons' ) . '">';
+		echo '<button type="button" class="b83-fb-icon-btn" data-role="picker-close"><span class="dashicons dashicons-no-alt"></span><span class="screen-reader-text">' . esc_html__( 'Close', 'b83-floating-buttons' ) . '</span></button></div>';
 		echo '<div class="b83-fb-picker__body">';
 		foreach ( $grouped as $group => $icons ) {
 			echo '<div class="b83-fb-picker__group"><h3>' . esc_html( $group ) . '</h3><div class="b83-fb-picker__grid">';
@@ -877,21 +929,21 @@ final class AdminPage {
 	 * Öffnen geladen und im Browser gefiltert.
 	 */
 	private function render_fa_picker(): void {
-		echo '<div class="b83-fb-picker b83-fb-picker--fa" id="b83-fb-fa-picker" hidden role="dialog" aria-label="' . esc_attr__( 'Font-Awesome-Icon wählen', 'b83-floating-buttons' ) . '">';
-		echo '<div class="b83-fb-picker__head"><input type="search" class="b83-fb-picker__search" data-role="fa-search" placeholder="' . esc_attr__( 'Suchen (englisch), z. B. phone, bed, ski …', 'b83-floating-buttons' ) . '" aria-label="' . esc_attr__( 'Icon suchen', 'b83-floating-buttons' ) . '">';
-		echo '<button type="button" class="b83-fb-icon-btn" data-role="picker-close"><span class="dashicons dashicons-no-alt"></span><span class="screen-reader-text">' . esc_html__( 'Schließen', 'b83-floating-buttons' ) . '</span></button></div>';
-		echo '<div class="b83-fb-picker__filter" role="radiogroup" aria-label="' . esc_attr__( 'Stil', 'b83-floating-buttons' ) . '">';
-		echo '<label><input type="radio" name="b83_fb_fa_style" value="" checked><span>' . esc_html__( 'Alle', 'b83-floating-buttons' ) . '</span></label>';
+		echo '<div class="b83-fb-picker b83-fb-picker--fa" id="b83-fb-fa-picker" hidden role="dialog" aria-label="' . esc_attr__( 'Choose a Font Awesome icon', 'b83-floating-buttons' ) . '">';
+		echo '<div class="b83-fb-picker__head"><input type="search" class="b83-fb-picker__search" data-role="fa-search" placeholder="' . esc_attr__( 'Search, e.g. phone, bed, ski …', 'b83-floating-buttons' ) . '" aria-label="' . esc_attr__( 'Search icons', 'b83-floating-buttons' ) . '">';
+		echo '<button type="button" class="b83-fb-icon-btn" data-role="picker-close"><span class="dashicons dashicons-no-alt"></span><span class="screen-reader-text">' . esc_html__( 'Close', 'b83-floating-buttons' ) . '</span></button></div>';
+		echo '<div class="b83-fb-picker__filter" role="radiogroup" aria-label="' . esc_attr__( 'Style', 'b83-floating-buttons' ) . '">';
+		echo '<label><input type="radio" name="b83_fb_fa_style" value="" checked><span>' . esc_html__( 'All', 'b83-floating-buttons' ) . '</span></label>';
 		foreach ( array(
 			's' => __( 'Solid', 'b83-floating-buttons' ),
 			'r' => __( 'Regular', 'b83-floating-buttons' ),
-			'b' => __( 'Marken', 'b83-floating-buttons' ),
+			'b' => __( 'Brands', 'b83-floating-buttons' ),
 		) as $value => $label ) {
 			echo '<label><input type="radio" name="b83_fb_fa_style" value="' . esc_attr( $value ) . '"><span>' . esc_html( $label ) . '</span></label>';
 		}
 		echo '</div>';
 		echo '<div class="b83-fb-picker__body"><div class="b83-fb-picker__grid" data-role="fa-grid"></div><p class="b83-fb-picker__note" data-role="fa-note"></p></div>';
-		echo '<div class="b83-fb-picker__foot">' . esc_html__( 'Icons: Font Awesome Free (fontawesome.com), Lizenz CC BY 4.0', 'b83-floating-buttons' ) . '</div>';
+		echo '<div class="b83-fb-picker__foot">' . esc_html__( 'Icons: Font Awesome Free (fontawesome.com), licence CC BY 4.0', 'b83-floating-buttons' ) . '</div>';
 		echo '</div>';
 	}
 
@@ -901,30 +953,30 @@ final class AdminPage {
 	private function render_position_box( array $group ): void {
 		echo '<section class="b83-fb-card"><h2>' . esc_html__( 'Position', 'b83-floating-buttons' ) . '</h2>';
 
-		echo '<div class="b83-fb-field"><span class="b83-fb-label">' . esc_html__( 'Bildschirmrand', 'b83-floating-buttons' ) . '</span><div class="b83-fb-positions">';
+		echo '<div class="b83-fb-field"><span class="b83-fb-label">' . esc_html__( 'Screen edge', 'b83-floating-buttons' ) . '</span><div class="b83-fb-positions">';
 		foreach ( $this->position_labels() as $value => $label ) {
 			echo '<label class="b83-fb-pos b83-fb-pos--' . esc_attr( $value ) . '"><input type="radio" name="group[position]" value="' . esc_attr( $value ) . '"' . checked( $group['position'], $value, false ) . '><span class="b83-fb-pos__screen"><span></span></span><span class="b83-fb-pos__label">' . esc_html( $label ) . '</span></label>';
 		}
 		echo '</div></div>';
 
 		echo '<div class="b83-fb-row">';
-		echo '<div class="b83-fb-field"><span class="b83-fb-label">' . esc_html__( 'Ausrichtung am Rand', 'b83-floating-buttons' ) . '</span><span class="b83-fb-seg" data-role="align">';
+		echo '<div class="b83-fb-field"><span class="b83-fb-label">' . esc_html__( 'Alignment along the edge', 'b83-floating-buttons' ) . '</span><span class="b83-fb-seg" data-role="align">';
 		$aligns = array(
-			'start'  => array( __( 'Oben', 'b83-floating-buttons' ), __( 'Links', 'b83-floating-buttons' ) ),
-			'center' => array( __( 'Mitte', 'b83-floating-buttons' ), __( 'Mitte', 'b83-floating-buttons' ) ),
-			'end'    => array( __( 'Unten', 'b83-floating-buttons' ), __( 'Rechts', 'b83-floating-buttons' ) ),
+			'start'  => array( __( 'Top', 'b83-floating-buttons' ), __( 'Left', 'b83-floating-buttons' ) ),
+			'center' => array( __( 'Center', 'b83-floating-buttons' ), __( 'Center', 'b83-floating-buttons' ) ),
+			'end'    => array( __( 'Bottom', 'b83-floating-buttons' ), __( 'Right', 'b83-floating-buttons' ) ),
 		);
 		foreach ( $aligns as $value => $labels ) {
 			echo '<label><input type="radio" name="group[align]" value="' . esc_attr( $value ) . '"' . checked( $group['align'], $value, false ) . '><span data-v="' . esc_attr( $labels[0] ) . '" data-h="' . esc_attr( $labels[1] ) . '">' . esc_html( $labels[0] ) . '</span></label>';
 		}
 		echo '</span></div>';
-		$this->number_field( 'align_offset', __( 'Abstand vom Anfang bzw. Ende', 'b83-floating-buttons' ), $group, 'px', __( 'Bei Ausrichtung Mitte ohne Wirkung.', 'b83-floating-buttons' ) );
+		$this->number_field( 'align_offset', __( 'Distance from start or end', 'b83-floating-buttons' ), $group, 'px', __( 'No effect when centred.', 'b83-floating-buttons' ) );
 		echo '</div>';
 
 		echo '<div class="b83-fb-row">';
-		$this->number_field( 'edge_offset', __( 'Abstand zum Rand', 'b83-floating-buttons' ), $group, 'px', __( '0 = bündig am Rand (Ecken dort gerade).', 'b83-floating-buttons' ) );
-		$this->number_field( 'gap', __( 'Abstand zwischen Buttons', 'b83-floating-buttons' ), $group, 'px' );
-		$this->number_field( 'peek', __( 'Eingeklappt im Rand versteckt', 'b83-floating-buttons' ), $group, '%', __( 'Fährt beim Drüberfahren ganz heraus.', 'b83-floating-buttons' ) );
+		$this->number_field( 'edge_offset', __( 'Distance from the edge', 'b83-floating-buttons' ), $group, 'px', __( '0 = flush with the edge (square corners there).', 'b83-floating-buttons' ) );
+		$this->number_field( 'gap', __( 'Space between buttons', 'b83-floating-buttons' ), $group, 'px' );
+		$this->number_field( 'peek', __( 'Hidden in the edge when collapsed', 'b83-floating-buttons' ), $group, '%', __( 'Slides out fully on hover.', 'b83-floating-buttons' ) );
 		echo '</div>';
 
 		echo '</section>';
@@ -934,44 +986,44 @@ final class AdminPage {
 
 	/** @param array<string,mixed> $group Leiste. */
 	private function render_style_box( array $group ): void {
-		echo '<section class="b83-fb-card"><h2>' . esc_html__( 'Aussehen', 'b83-floating-buttons' ) . '</h2>';
+		echo '<section class="b83-fb-card"><h2>' . esc_html__( 'Appearance', 'b83-floating-buttons' ) . '</h2>';
 
 		echo '<div class="b83-fb-row">';
-		$this->number_field( 'size', __( 'Button-Größe', 'b83-floating-buttons' ), $group, 'px' );
-		$this->number_field( 'icon_size', __( 'Icon-Größe', 'b83-floating-buttons' ), $group, '%', __( 'Anteil an der Button-Größe.', 'b83-floating-buttons' ) );
-		$this->number_field( 'radius', __( 'Eckenradius', 'b83-floating-buttons' ), $group, 'px', __( 'Halbe Button-Größe = rund.', 'b83-floating-buttons' ) );
+		$this->number_field( 'size', __( 'Button size', 'b83-floating-buttons' ), $group, 'px' );
+		$this->number_field( 'icon_size', __( 'Icon size', 'b83-floating-buttons' ), $group, '%', __( 'Share of the button size.', 'b83-floating-buttons' ) );
+		$this->number_field( 'radius', __( 'Corner radius', 'b83-floating-buttons' ), $group, 'px', __( 'Half the button size = round.', 'b83-floating-buttons' ) );
 		echo '</div>';
 
 		echo '<div class="b83-fb-row">';
-		$this->number_field( 'font_size', __( 'Schriftgröße Überschrift', 'b83-floating-buttons' ), $group, 'px' );
-		$this->number_field( 'sub_size', __( 'Schriftgröße Zusatztext', 'b83-floating-buttons' ), $group, 'px' );
+		$this->number_field( 'font_size', __( 'Heading font size', 'b83-floating-buttons' ), $group, 'px' );
+		$this->number_field( 'sub_size', __( 'Small text font size', 'b83-floating-buttons' ), $group, 'px' );
 		$this->select_field(
 			'font_weight',
-			__( 'Schriftstärke', 'b83-floating-buttons' ),
+			__( 'Font weight', 'b83-floating-buttons' ),
 			$group,
 			array(
 				'400' => __( 'Normal', 'b83-floating-buttons' ),
-				'600' => __( 'Halbfett', 'b83-floating-buttons' ),
-				'700' => __( 'Fett', 'b83-floating-buttons' ),
+				'600' => __( 'Semibold', 'b83-floating-buttons' ),
+				'700' => __( 'Bold', 'b83-floating-buttons' ),
 			)
 		);
 		$this->select_field(
 			'shadow',
-			__( 'Schatten', 'b83-floating-buttons' ),
+			__( 'Shadow', 'b83-floating-buttons' ),
 			$group,
 			array(
-				'none'   => __( 'Kein', 'b83-floating-buttons' ),
-				'soft'   => __( 'Weich', 'b83-floating-buttons' ),
-				'strong' => __( 'Kräftig', 'b83-floating-buttons' ),
+				'none'   => __( 'None', 'b83-floating-buttons' ),
+				'soft'   => __( 'Soft', 'b83-floating-buttons' ),
+				'strong' => __( 'Strong', 'b83-floating-buttons' ),
 			)
 		);
 		echo '</div>';
 
-		echo '<h3>' . esc_html__( 'Farben', 'b83-floating-buttons' ) . '</h3>';
+		echo '<h3>' . esc_html__( 'Colours', 'b83-floating-buttons' ) . '</h3>';
 		echo '<div class="b83-fb-colorgrid">';
-		echo '<span></span><strong>' . esc_html__( 'Normal', 'b83-floating-buttons' ) . '</strong><strong>' . esc_html__( 'Mouseover', 'b83-floating-buttons' ) . '</strong>';
+		echo '<span></span><strong>' . esc_html__( 'Normal', 'b83-floating-buttons' ) . '</strong><strong>' . esc_html__( 'Hover', 'b83-floating-buttons' ) . '</strong>';
 		$rows = array(
-			array( __( 'Hintergrund', 'b83-floating-buttons' ), 'bg', 'bg_hover' ),
+			array( __( 'Background', 'b83-floating-buttons' ), 'bg', 'bg_hover' ),
 			array( __( 'Icon', 'b83-floating-buttons' ), 'color', 'color_hover' ),
 			array( __( 'Text', 'b83-floating-buttons' ), 'text_color', 'text_hover' ),
 		);
@@ -980,11 +1032,11 @@ final class AdminPage {
 			$this->color_input( 'group[' . $row[1] . ']', (string) $group[ $row[1] ], $row[0] );
 			$this->color_input( 'group[' . $row[2] . ']', (string) $group[ $row[2] ], $row[0] . ' (Mouseover)' );
 		}
-		echo '<span class="b83-fb-colorgrid__label">' . esc_html__( 'Info-Text', 'b83-floating-buttons' ) . '</span>';
-		$this->color_input( 'group[tip_bg]', (string) $group['tip_bg'], __( 'Info-Text Hintergrund', 'b83-floating-buttons' ) );
-		$this->color_input( 'group[tip_color]', (string) $group['tip_color'], __( 'Info-Text Schrift', 'b83-floating-buttons' ) );
+		echo '<span class="b83-fb-colorgrid__label">' . esc_html__( 'Info text', 'b83-floating-buttons' ) . '</span>';
+		$this->color_input( 'group[tip_bg]', (string) $group['tip_bg'], __( 'Info text background', 'b83-floating-buttons' ) );
+		$this->color_input( 'group[tip_color]', (string) $group['tip_color'], __( 'Info text colour', 'b83-floating-buttons' ) );
 		echo '</div>';
-		echo '<p class="description">' . esc_html__( 'Info-Text: links Hintergrund, rechts Schriftfarbe. Einzelne Buttons können eigene Farben bekommen.', 'b83-floating-buttons' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Info text: background on the left, text colour on the right. Individual buttons can have their own colours.', 'b83-floating-buttons' ) . '</p>';
 
 		echo '</section>';
 	}
@@ -993,24 +1045,24 @@ final class AdminPage {
 
 	/** @param array<string,mixed> $group Leiste. */
 	private function render_behavior_box( array $group ): void {
-		echo '<section class="b83-fb-card"><h2>' . esc_html__( 'Verhalten', 'b83-floating-buttons' ) . '</h2>';
+		echo '<section class="b83-fb-card"><h2>' . esc_html__( 'Behaviour', 'b83-floating-buttons' ) . '</h2>';
 		echo '<div class="b83-fb-row">';
-		$this->number_field( 'delay', __( 'Verzögerung beim Ausklappen', 'b83-floating-buttons' ), $group, 'ms', __( 'Verhindert Aufklappen beim bloßen Vorbeifahren. Empfohlen: 100–250.', 'b83-floating-buttons' ) );
-		$this->number_field( 'duration', __( 'Dauer der Animation', 'b83-floating-buttons' ), $group, 'ms' );
+		$this->number_field( 'delay', __( 'Delay before expanding', 'b83-floating-buttons' ), $group, 'ms', __( 'Prevents expanding when the mouse just passes by. Recommended: 100–250.', 'b83-floating-buttons' ) );
+		$this->number_field( 'duration', __( 'Animation duration', 'b83-floating-buttons' ), $group, 'ms' );
 		$this->select_field(
 			'entrance',
-			__( 'Einblenden beim Laden', 'b83-floating-buttons' ),
+			__( 'Appearance on page load', 'b83-floating-buttons' ),
 			$group,
 			array(
-				'none'  => __( 'Sofort sichtbar', 'b83-floating-buttons' ),
-				'fade'  => __( 'Einblenden', 'b83-floating-buttons' ),
-				'slide' => __( 'Hereinfahren', 'b83-floating-buttons' ),
+				'none'  => __( 'Visible immediately', 'b83-floating-buttons' ),
+				'fade'  => __( 'Fade in', 'b83-floating-buttons' ),
+				'slide' => __( 'Slide in', 'b83-floating-buttons' ),
 			)
 		);
 		echo '</div>';
 		echo '<div class="b83-fb-row">';
-		echo '<label class="b83-fb-check"><input type="checkbox" name="group[tooltips]" value="1"' . checked( $group['tooltips'], true, false ) . '> ' . esc_html__( 'Info-Texte anzeigen', 'b83-floating-buttons' ) . '</label>';
-		$this->number_field( 'z_index', __( 'Ebene (z-index)', 'b83-floating-buttons' ), $group, '', __( 'Nur ändern, wenn Buttons von anderen Elementen verdeckt werden.', 'b83-floating-buttons' ) );
+		echo '<label class="b83-fb-check"><input type="checkbox" name="group[tooltips]" value="1"' . checked( $group['tooltips'], true, false ) . '> ' . esc_html__( 'Show info texts', 'b83-floating-buttons' ) . '</label>';
+		$this->number_field( 'z_index', __( 'Layer (z-index)', 'b83-floating-buttons' ), $group, '', __( 'Only change this if other elements cover the buttons.', 'b83-floating-buttons' ) );
 		echo '</div>';
 		echo '</section>';
 	}
@@ -1019,32 +1071,32 @@ final class AdminPage {
 
 	/** @param array<string,mixed> $group Leiste. */
 	private function render_devices_box( array $group ): void {
-		echo '<section class="b83-fb-card"><h2>' . esc_html__( 'Geräte & Seiten', 'b83-floating-buttons' ) . '</h2>';
+		echo '<section class="b83-fb-card"><h2>' . esc_html__( 'Devices & pages', 'b83-floating-buttons' ) . '</h2>';
 
 		echo '<div class="b83-fb-row">';
-		echo '<div class="b83-fb-field"><span class="b83-fb-label">' . esc_html__( 'Anzeigen auf', 'b83-floating-buttons' ) . '</span><span class="b83-fb-checks">';
+		echo '<div class="b83-fb-field"><span class="b83-fb-label">' . esc_html__( 'Show on', 'b83-floating-buttons' ) . '</span><span class="b83-fb-checks">';
 		foreach ( array(
 			'show_desktop' => array( __( 'Desktop', 'b83-floating-buttons' ), 'desktop' ),
 			'show_tablet'  => array( __( 'Tablet', 'b83-floating-buttons' ), 'tablet' ),
-			'show_mobile'  => array( __( 'Mobil', 'b83-floating-buttons' ), 'smartphone' ),
+			'show_mobile'  => array( __( 'Mobile', 'b83-floating-buttons' ), 'smartphone' ),
 		) as $key => $data ) {
 			echo '<label class="b83-fb-check"><input type="checkbox" name="group[' . esc_attr( $key ) . ']" value="1"' . checked( $group[ $key ], true, false ) . '> <span class="dashicons dashicons-' . esc_attr( $data[1] ) . '"></span> ' . esc_html( $data[0] ) . '</label>';
 		}
-		echo '</span><span class="description">' . esc_html__( 'Tablet: 768–1024 px, Mobil: bis 767 px (wie Elementor).', 'b83-floating-buttons' ) . '</span></div>';
+		echo '</span><span class="description">' . esc_html__( 'Tablet: 768–1024 px, mobile: up to 767 px (same as Elementor).', 'b83-floating-buttons' ) . '</span></div>';
 		echo '</div>';
 
 		echo '<div class="b83-fb-row">';
 		$this->select_field(
 			'mobile_layout',
-			__( 'Darstellung auf Mobilgeräten', 'b83-floating-buttons' ),
+			__( 'Display on mobile devices', 'b83-floating-buttons' ),
 			$group,
 			array(
-				'same'    => __( 'Wie Desktop – 1. Antippen klappt aus, 2. öffnet', 'b83-floating-buttons' ),
-				'compact' => __( 'Nur Icons – Antippen öffnet sofort', 'b83-floating-buttons' ),
-				'bar'     => __( 'Leiste am unteren Rand (volle Breite)', 'b83-floating-buttons' ),
+				'same'    => __( 'Like desktop: first tap expands, second tap opens', 'b83-floating-buttons' ),
+				'compact' => __( 'Icons only: a tap opens the link right away', 'b83-floating-buttons' ),
+				'bar'     => __( 'Bar at the bottom (full width)', 'b83-floating-buttons' ),
 			)
 		);
-		$this->number_field( 'mobile_size', __( 'Button-Größe mobil', 'b83-floating-buttons' ), $group, 'px' );
+		$this->number_field( 'mobile_size', __( 'Button size on mobile', 'b83-floating-buttons' ), $group, 'px' );
 		echo '</div>';
 
 		// Seiten ausschließen.
@@ -1056,21 +1108,32 @@ final class AdminPage {
 			)
 		);
 		$excluded = array_map( 'intval', (array) $group['exclude_ids'] );
-		echo '<div class="b83-fb-field"><span class="b83-fb-label">' . esc_html__( 'Nicht anzeigen auf diesen Seiten', 'b83-floating-buttons' ) . '</span>';
-		echo '<input type="search" class="b83-fb-pagesearch" placeholder="' . esc_attr__( 'Seiten filtern …', 'b83-floating-buttons' ) . '" aria-label="' . esc_attr__( 'Seiten filtern', 'b83-floating-buttons' ) . '">';
+		echo '<div class="b83-fb-field"><span class="b83-fb-label">' . esc_html__( 'Do not show on these pages', 'b83-floating-buttons' ) . '</span>';
+		echo '<input type="search" class="b83-fb-pagesearch" placeholder="' . esc_attr__( 'Filter pages …', 'b83-floating-buttons' ) . '" aria-label="' . esc_attr__( 'Filter pages', 'b83-floating-buttons' ) . '">';
 		echo '<div class="b83-fb-pagelist">';
 		$page_ids = array();
 		foreach ( (array) $pages as $page ) {
 			$page_ids[] = (int) $page->ID;
 			$depth      = count( get_post_ancestors( $page ) );
-			echo '<label style="--depth:' . (int) $depth . '"><input type="checkbox" name="group[exclude_ids][]" value="' . (int) $page->ID . '"' . checked( in_array( (int) $page->ID, $excluded, true ), true, false ) . '> ' . esc_html( '' !== $page->post_title ? $page->post_title : __( '(ohne Titel)', 'b83-floating-buttons' ) ) . '</label>';
+			echo '<label style="--depth:' . (int) $depth . '"><input type="checkbox" name="group[exclude_ids][]" value="' . (int) $page->ID . '"' . checked( in_array( (int) $page->ID, $excluded, true ), true, false ) . '> ' . esc_html( '' !== $page->post_title ? $page->post_title : __( '(no title)', 'b83-floating-buttons' ) ) . '</label>';
 		}
 		echo '</div>';
 		// Ausgeschlossene Beiträge u. ä. (nicht in der Seitenliste) erhalten.
 		$others = array_diff( $excluded, $page_ids );
-		echo '<label class="b83-fb-label b83-fb-label--small" for="b83-fb-exclude-extra">' . esc_html__( 'Weitere IDs (Beiträge, Produkte …), durch Komma getrennt', 'b83-floating-buttons' ) . '</label>';
+		echo '<label class="b83-fb-label b83-fb-label--small" for="b83-fb-exclude-extra">' . esc_html__( 'More IDs (posts, products …), separated by commas', 'b83-floating-buttons' ) . '</label>';
 		echo '<input type="text" id="b83-fb-exclude-extra" name="group[exclude_ids][]" value="' . esc_attr( implode( ', ', $others ) ) . '" class="regular-text">';
 		echo '</div>';
+
+		/**
+		 * Weitere Anzeigeregeln einer Leiste (Pro).
+		 *
+		 * @param array<string,mixed> $group Leiste.
+		 */
+		do_action( 'b83_floating_buttons_admin_rules', $group );
+
+		if ( ! b83fb_fs()->can_use_premium_code() ) {
+			echo '<p class="b83-fb-pro-hint"><span class="b83-fb-pro-badge">Pro</span> ' . esc_html__( 'Show this bar only on chosen pages, post types or languages, and show buttons only during opening hours.', 'b83-floating-buttons' ) . ' <a href="' . esc_url( self::url( array( 'tab' => 'settings' ) ) ) . '">' . esc_html__( 'Learn more', 'b83-floating-buttons' ) . '</a></p>';
+		}
 
 		echo '</section>';
 	}
@@ -1080,22 +1143,22 @@ final class AdminPage {
 	private function render_preview_box(): void {
 		echo '<aside class="b83-fb-editor__side"><div class="b83-fb-sticky">';
 		echo '<div class="b83-fb-card b83-fb-preview">';
-		echo '<div class="b83-fb-card__head"><h2>' . esc_html__( 'Live-Vorschau', 'b83-floating-buttons' ) . '</h2>';
-		echo '<span class="b83-fb-seg b83-fb-devices" role="group" aria-label="' . esc_attr__( 'Gerät', 'b83-floating-buttons' ) . '">';
+		echo '<div class="b83-fb-card__head"><h2>' . esc_html__( 'Live preview', 'b83-floating-buttons' ) . '</h2>';
+		echo '<span class="b83-fb-seg b83-fb-devices" role="group" aria-label="' . esc_attr__( 'Device', 'b83-floating-buttons' ) . '">';
 		foreach ( array(
 			'desktop' => array( 'desktop', __( 'Desktop', 'b83-floating-buttons' ), 1280 ),
 			'tablet'  => array( 'tablet', __( 'Tablet', 'b83-floating-buttons' ), 820 ),
-			'mobile'  => array( 'smartphone', __( 'Mobil', 'b83-floating-buttons' ), 390 ),
+			'mobile'  => array( 'smartphone', __( 'Mobile', 'b83-floating-buttons' ), 390 ),
 		) as $key => $data ) {
 			echo '<label title="' . esc_attr( $data[1] ) . '"><input type="radio" name="b83_fb_device" value="' . esc_attr( $key ) . '" data-width="' . (int) $data[2] . '"' . checked( 'desktop', $key, false ) . '><span><span class="dashicons dashicons-' . esc_attr( $data[0] ) . '"></span><span class="screen-reader-text">' . esc_html( $data[1] ) . '</span></span></label>';
 		}
 		echo '</span></div>';
-		echo '<div class="b83-fb-stage" id="b83-fb-stage"><iframe id="b83-fb-frame" title="' . esc_attr__( 'Vorschau', 'b83-floating-buttons' ) . '" sandbox="allow-scripts"></iframe></div>';
-		echo '<p class="description">' . esc_html__( 'Mit der Maus über die Buttons fahren, um Ausklappen und Info-Text zu sehen. Die Vorschau zeigt auch deaktivierte Leisten.', 'b83-floating-buttons' ) . '</p>';
+		echo '<div class="b83-fb-stage" id="b83-fb-stage"><iframe id="b83-fb-frame" title="' . esc_attr__( 'Preview', 'b83-floating-buttons' ) . '" sandbox="allow-scripts"></iframe></div>';
+		echo '<p class="description">' . esc_html__( 'Hover over the buttons to see them expand and show their info text. The preview also shows inactive bars.', 'b83-floating-buttons' ) . '</p>';
 		echo '</div>';
 
 		echo '<div class="b83-fb-savebar">';
-		submit_button( __( 'Speichern', 'b83-floating-buttons' ), 'primary large', 'submit', false );
+		submit_button( __( 'Save', 'b83-floating-buttons' ), 'primary large', 'submit', false );
 		echo '</div>';
 		echo '</div></aside>';
 	}
