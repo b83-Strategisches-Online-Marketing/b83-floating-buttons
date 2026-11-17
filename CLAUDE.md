@@ -12,7 +12,7 @@
 - **Präfix für Funktionen, Optionen, Hooks:** `b83_fb_` (Namespace: `B83\FloatingButtons`)
 - **Repository:** github.com/b83-Strategisches-Online-Marketing/b83-floating-buttons (öffentlich)
 - **Vertrieb:** Freemium über Freemius (Freemius-ID 43519, Pro-Plan mit 30 Tagen Testphase). Die Gratisversion kommt von wordpress.org, Pro von Freemius. Dieses öffentliche Repository ist nur das Abbild der von Freemius erzeugten Gratisversion und liefert Websites mit 1.x (eingebauter GitHub-Updater, in 2.x entfernt) das Update auf 2.x. Das private Repository heißt `b83-floating-buttons-pro`, weil dieser Name hier schon belegt ist.
-- **Im Einsatz auf:** Kundenseiten von b83 mit eigener unbegrenzter Pro-Lizenz; welche Seiten genau, ist offen (Wolfgang ergänzt)
+- **Im Einsatz auf:** mehrere Kundenseiten
 - **Zweck in einem Satz:** Floating Buttons am Seitenrand mit Icons, Info-Texten, Links, E-Mail, Telefon, WhatsApp und Chat.
 
 ## b83-Standards (gelten für alle b83-Plugins)
@@ -141,5 +141,4 @@ Kontakt in Doku und Support-Texten: office@b83.at
 ## Offene Punkte
 
 - Quellsprache der Oberfläche ist Englisch (passt zum Verkaufs-Plugin). Code-Kommentare sind teils Deutsch (z. B. Hauptdatei, `AdminPage.php`); laut Standard für Verkaufs-Plugins Englisch. Nicht umgestellt, im privaten Repository entscheiden.
-- Kundenseiten mit Einsatz dieses Plugins eintragen.
 - Icons, Banner und Screenshots auf wordpress.org per SVN hochladen, falls noch nicht geschehen.
