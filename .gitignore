@@ -1,2 +1,22 @@
-node_modules/
+# Persönliche Claude-Code-Dateien
+CLAUDE.local.md
+.claude/settings.local.json
+
+# Abhängigkeiten und Builds
+/node_modules/
+/build/
+*.zip
+
+# Secrets
+.env
+.env.*
+.secret
+.secret.*
+.challenge.json
+
+# System
 .DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
